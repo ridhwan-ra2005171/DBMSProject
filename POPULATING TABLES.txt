@@ -1,0 +1,55 @@
+-- Additional records for Employee table
+INSERT INTO Employee (SSN, Fname, Minit, Lname, DOB, Address, Gender, PhoneNo, HireDate, Manager, ManagerSSN)
+VALUES
+    ('4567', 'Sara', 'L', 'Khan', '1993-07-21', '567 Pine St', 'Female', '555-456-7890', '2018-04-15', false, NULL),
+    ('5678', 'Carlos', 'J', 'Lopez', '1991-03-12', '678 Cedar St', 'Male', '555-567-8901', '2016-09-30', false, NULL),
+    ('6789', 'Lina', 'S', 'Martinez', '1995-11-05', '789 Birch St', 'Female', '555-678-9012', '2019-06-22', false, NULL);
+
+-- Additional records for Secretary table
+INSERT INTO Secretary (SSN, TypingSpeed)
+VALUES
+    ('4567', 70),
+    ('5678', 65),
+    ('6789', 55);
+
+-- Additional records for Technician table
+INSERT INTO Technician (SSN, Tgrade)
+VALUES
+    ('4567', 3),
+    ('5678', 4),
+    ('6789', 2);
+
+-- Additional records for Engineer table
+INSERT INTO Engineer (SSN, EngType)
+VALUES
+    ('4567', 'Electrical'),
+    ('5678', 'Mechanical'),
+    ('6789', 'Civil');
+
+-- Additional records for Salaried_Employee table
+INSERT INTO Salaried_Employee (SSN, Salary)
+VALUES
+    ('4567', 58000.00),
+    ('5678', 62000.00),
+    ('6789', 60000.00);
+
+-- Additional records for Trade_Union table
+INSERT INTO Trade_Union (UnionID, UnionName, UnionAddress, TotalMembers)
+VALUES
+    ('UNION004', 'Healthcare Workers Union', '456 Health Rd', 1500),
+    ('UNION005', 'Teachers Union', '789 Education Ave', 900),
+    ('UNION006', 'Transport Workers Union', '123 Transport Blvd', 1100);
+
+-- Additional records for Hourly_Employee table
+INSERT INTO Hourly_Employee (SSN, PayScale, HoursWorked, UnionID)
+VALUES
+    ('4567', 13.50, 175, 'UNION004'),
+    ('5678', 14.25, 160, 'UNION005'),
+    ('6789', 14.75, 155, 'UNION006');
+
+-- Additional records for Project table
+INSERT INTO Project (ProjectNo, ProjectName, Description, ProjectLoc, ManagedBy)
+VALUES
+    (104, 'Bridge Construction', 'Construction of a new bridge', 'Riverfront', '4567'),
+    (105, 'Mobile App Development', 'Development of a mobile application', 'Tech Park', '5678'),
+    (106, 'Road Expansion', 'Expanding city roadways', 'Downtown', '6789');
