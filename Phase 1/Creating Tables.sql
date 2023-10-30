@@ -10,7 +10,8 @@ CREATE TABLE Employee (
     PhoneNo VARCHAR(15),
     HireDate DATE,
     Manager BOOLEAN,
-    ManagerSSN VARCHAR(9)
+    ManagerSSN VARCHAR(9),
+    FOREIGN KEY (ManagerSSN) REFERENCES Employee(SSN)
 );
 
 # Creating Secretary Table
@@ -20,11 +21,10 @@ CREATE TABLE Secretary (
     FOREIGN KEY (SSN) REFERENCES Employee(SSN)
 );
 
-
 # Creating Technician Table
 CREATE TABLE Technician (
     SSN VARCHAR(9) PRIMARY KEY,
-    Tgrade INT NOT NULL,
+    Tgrade ENUM('1', '2', '3'),
     FOREIGN KEY (SSN) REFERENCES Employee(SSN)
 );
 
@@ -46,8 +46,7 @@ CREATE TABLE Salaried_Employee (
 CREATE TABLE Trade_Union (
     UnionID VARCHAR(10) PRIMARY KEY,
     UnionName VARCHAR(255) NOT NULL,
-    UnionAddress VARCHAR(255),
-    TotalMembers INT
+    UnionAddress VARCHAR(255)
 );
 
 # Creating Hourly_Employee Table
