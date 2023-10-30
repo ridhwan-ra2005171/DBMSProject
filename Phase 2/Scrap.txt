@@ -1,0 +1,16 @@
+CREATE TABLE Employee (
+    SSN VARCHAR(9) PRIMARY KEY,
+    Fname VARCHAR(50) NOT NULL,
+    Minit CHAR(1),
+    Lname VARCHAR(50) NOT NULL,
+    DOB DATE NOT NULL,
+    Address VARCHAR(255),
+    Gender ENUM('Male', 'Female'),
+    PhoneNo VARCHAR(15),
+    HireDate DATE,
+    Manager BOOLEAN,
+    ManagerSSN VARCHAR(9),
+    FOREIGN KEY (ManagerSSN) REFERENCES Employee(SSN)
+);
+
+('1234', 'Mohammed', 'A', 'Ali', '1990-05-15', '123 Main St', 'Male', '555-123-4567', '2015-03-20', FALSE, NULL)

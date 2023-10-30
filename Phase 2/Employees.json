@@ -1,0 +1,80 @@
+[
+  {
+    "SSN": "1234",
+    "Fname": "Mohammed",
+    "Minit": "A",
+    "Lname": "Ali",
+    "DOB": "1990-05-15",
+    "Address": "123 Main St",
+    "Gender": "Male",
+    "PhoneNo": "555-123-4567",
+    "HireDate": "2015-03-20",
+    "Manager": false,
+    "ManagerSSN": null
+  },
+  {
+    "SSN": "2345",
+    "Fname": "Lea",
+    "Minit": "R",
+    "Lname": "Garcia",
+    "DOB": "1988-09-10",
+    "Address": "456 Elm St",
+    "Gender": "Female",
+    "PhoneNo": "555-234-5678",
+    "HireDate": "2016-02-12",
+    "Manager": false,
+    "ManagerSSN": null
+  },
+  {
+    "SSN": "5678",
+    "Fname": "Carlos",
+    "Minit": "J",
+    "Lname": "Lopez",
+    "DOB": "1991-03-12",
+    "Address": "678 Cedar St",
+    "Gender": "Male",
+    "PhoneNo": "555-567-8901",
+    "HireDate": "2016-09-30",
+    "Manager": true,
+    "ManagerSSN": null
+  },
+  {
+    "SSN": "6789",
+    "Fname": "Lina",
+    "Minit": "S",
+    "Lname": "Martinez",
+    "DOB": "1995-11-05",
+    "Address": "789 Birch St",
+    "Gender": "Female",
+    "PhoneNo": "555-678-9012",
+    "HireDate": "2019-06-22",
+    "Manager": true,
+    "ManagerSSN": null
+  },
+  {
+    "SSN": "3456",
+    "Fname": "James",
+    "Minit": "M",
+    "Lname": "Rodriguez",
+    "DOB": "1992-12-02",
+    "Address": "789 Oak St",
+    "Gender": "Male",
+    "PhoneNo": "555-345-6789",
+    "HireDate": "2017-08-05",
+    "Manager": false,
+    "ManagerSSN": "6789"
+  },
+  {
+    "SSN": "4567",
+    "Fname": "Sara",
+    "Minit": "L",
+    "Lname": "Khan",
+    "DOB": "1993-07-21",
+    "Address": "567 Pine St",
+    "Gender": "Female",
+    "PhoneNo": "555-456-7890",
+    "HireDate": "2018-04-15",
+    "Manager": false,
+    "ManagerSSN": "6789"
+  }
+]
