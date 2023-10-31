@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun QueryScreen() {
     var selectedOperation by remember { mutableStateOf("") }
+    var selectedTable by remember { mutableStateOf("") }
     var selectedAttribute by remember { mutableStateOf("") }
     var selectedOperator by remember { mutableStateOf("") }
 //
@@ -40,11 +41,24 @@ fun QueryScreen() {
     var queryResult by remember { mutableStateOf("") }
 
     val operationList = listOf("SELECT", "JOIN")
-    val attributeList = listOf("SSN", "Fname", "Minit", "Lname", "DOB", "Address", "Gender", "PhoneNo", "HireDate", "Manager", "ManagerSSN") //subject to change
+    //add if statement for attribute list
+    val tableList = listOf("Employee", "Project")
+    var attributeList = mutableListOf("SSN", "Fname", "Minit", "Lname", "DOB", "Address", "Gender", "PhoneNo", "HireDate", "Manager", "ManagerSSN") //subject to change
+    attributeList = mutableListOf("test")
+
     val operatorList = listOf("=", "<", ">", "<=", ">=")
 
+    when (selectedTable) {
+        "Employee" -> {
+            attributeList = mutableListOf("SSN", "Fname", "Minit", "Lname", "DOB", "Address", "Gender", "PhoneNo", "HireDate", "Manager", "ManagerSSN")
+        }
+        "Project" -> {
+            attributeList = mutableListOf("ProjectNo", "ProjectName", "Description", "ProjectLoc", "ManagedBy")
+        }
+    }
 
-    Column (modifier = Modifier.fillMaxSize(),
+
+    Column (modifier = Modifier.fillMaxSize().padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
     //dropdown select or join
         DDMenu(
@@ -54,6 +68,18 @@ fun QueryScreen() {
         ){ selectedValue ->
             selectedOperation = selectedValue
         }
+
+        if (selectedOperation == "SELECT") {
+        //dropdown table selection
+        DDMenu(
+            items = tableList,
+            selectedItem = remember { mutableStateOf(selectedTable) },
+            label = "Select a table"
+        ){ selectedValue ->
+            selectedTable = selectedValue
+        }
+
+
         // choose on what (if select is chosen), otherwise on join choice it wont be chosen
         DDMenu(
             items = attributeList,
@@ -62,10 +88,9 @@ fun QueryScreen() {
         ){ selectedValue ->
             selectedAttribute = selectedValue
         }
-//        selectedOperation = "SELECT"
 
-        Log.d("Selected", "QueryScreen: ${selectedOperation}")
-        if (selectedOperation == "SELECT") {
+
+
         //operator chosen
         DDMenu(
             items = operatorList,
@@ -74,6 +99,12 @@ fun QueryScreen() {
         ){ selectedValue ->
             selectedOperator = selectedValue
         }
+
+
+            Log.d("Selected", "QueryScreen: ${selectedOperation}")
+            Log.d("Selected", "QueryScreen: ${selectedTable}")
+            Log.d("Selected", "QueryScreen: ${selectedAttribute}")
+            Log.d("Selected", "QueryScreen: ${selectedOperator}")
         //textfield for that operation
         OutlinedTextField(
             value = operatorText,
@@ -94,10 +125,23 @@ fun QueryScreen() {
                 .border(1.dp, Color.Gray, MaterialTheme.shapes.small) // Add the border
                 .padding(16.dp)
         )
+            queryResult = selectedOperation + " " + selectedTable + " " + selectedAttribute + " " + selectedOperator + " " + operatorText
+        }else if(selectedOperation == "JOIN"){
+            //if join is chosen, display attribute for equijoin
+            attributeList = mutableListOf("ManagerSSN")
+            DDMenu(
+                items = attributeList,
+                selectedItem = remember { mutableStateOf(selectedAttribute) },
+                label = "Select an attribute"
+            ){ selectedValue ->
+                selectedAttribute = selectedValue
+            }
+            queryResult = selectedOperation + " " + selectedAttribute
+
         }
 
         //result to display the query
-        Text("this is to display the query")
+        Text(text = queryResult)
 
         //text for the result of query:
         Text(text = "Result is here")
