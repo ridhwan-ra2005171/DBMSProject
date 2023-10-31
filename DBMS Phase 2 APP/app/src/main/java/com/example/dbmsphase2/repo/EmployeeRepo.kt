@@ -34,8 +34,8 @@ fun main(args: Array<String>) {
 }
 
 private fun initKotlin() {
-    val data = File("app/src/main/assets/Employees.json").readText()
+    val data = File("C:\\Users\\ridhw\\Documents\\Fall 2023\\Database Management System\\DBMSProject\\DBMS Phase 2 APP\\app\\src\\androidTest\\assets\\Employees.json").readText()
     val jsonData = Json.decodeFromString<List<Employee>>(data)
-//    ProjectRepo.employees.addAll(jsonData)
+//    EmployeeRepo.employees.addAll(jsonData)
     EmployeeRepo.employees.addAll(jsonData)
 }

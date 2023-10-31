@@ -66,6 +66,7 @@ fun DDMenu(
                     onClick = {
                         selectedItem.value = it
                         expanded = false
+                        onItemSelected(it)
                     },
                     text = { Text(text = it) }
                 )
