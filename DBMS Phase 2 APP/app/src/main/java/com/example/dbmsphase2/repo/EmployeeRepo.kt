@@ -10,12 +10,12 @@ object EmployeeRepo {
     var employees = mutableListOf<Employee>()
 
     //reading from json
-    fun initProducts(context: Context):List<Employee>{
+    fun initEmployees(context: Context):List<Employee>{
         if(employees.isEmpty()){
             val jsonContent=
                 context
                     .assets
-                    .open("Employees.json")
+                    .open("employees.json")
                     .bufferedReader().use { it.readText() }
             employees = Json{ignoreUnknownKeys = true}.decodeFromString(jsonContent)
         }
@@ -34,7 +34,7 @@ fun main(args: Array<String>) {
 }
 
 private fun initKotlin() {
-    val data = File("C:\\Users\\ridhw\\Documents\\Fall 2023\\Database Management System\\DBMSProject\\DBMS Phase 2 APP\\app\\src\\androidTest\\assets\\Employees.json").readText()
+    val data = File("employees.json").readText()
     val jsonData = Json.decodeFromString<List<Employee>>(data)
 //    EmployeeRepo.employees.addAll(jsonData)
     EmployeeRepo.employees.addAll(jsonData)

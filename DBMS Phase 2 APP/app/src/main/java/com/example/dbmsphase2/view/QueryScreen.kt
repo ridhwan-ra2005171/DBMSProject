@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -58,7 +59,9 @@ fun QueryScreen() {
     }
 
 
-    Column (modifier = Modifier.fillMaxSize().padding(10.dp),
+    Column (modifier = Modifier
+        .fillMaxSize()
+        .padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
     //dropdown select or join
         DDMenu(
@@ -146,10 +149,11 @@ fun QueryScreen() {
         //text for the result of query:
         Text(text = "Result is here")
 
-        //lazy column to list the results of the algorithms and sort them in descending order in terms of time
-        LazyColumn {
+        //lazy Row to list the results
+        LazyRow() {
 
         }
+        //need to display of the algorithms and sort them in descending order in terms of time
     }
 }
 
