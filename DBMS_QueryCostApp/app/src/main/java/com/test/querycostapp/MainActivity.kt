@@ -45,6 +45,11 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
         text = "Hello $name!",
         modifier = modifier
     )
+    val emps = EmployeeRepo.initEmployees(LocalContext.current)
+    Log.d("EMP2", emps.map { it.Fname }.toString())
+
+    val projects = ProjectRepo.initProjects(LocalContext.current)
+    Log.d("EMP2", projects.map { it.ProjectName }.toString())
 }
 
 @Preview(showBackground = true)
