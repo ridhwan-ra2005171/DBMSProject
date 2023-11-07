@@ -27,7 +27,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.test.querycostapp.repo.CostEstimatorRepo
+import com.test.querycostapp.repo.CostEstimatorRepo.handleQuery
 import com.test.querycostapp.repo.EmployeeRepo
+import com.test.querycostapp.repo.ProjectRepo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,6 +37,10 @@ fun QueryScreen2() {
     var queryText by remember { mutableStateOf("") }
     var queryResult by remember { mutableStateOf("") }
     var queryTokens = queryResult.split(Regex("\\s+")) // Tokenize by whitespace
+
+    CostEstimatorRepo.employees = EmployeeRepo.initEmployees(LocalContext.current).toMutableList()
+    CostEstimatorRepo.projects = ProjectRepo.initProjects(LocalContext.current).toMutableList()
+
 
     Column(
         modifier = Modifier
@@ -70,17 +76,18 @@ fun QueryScreen2() {
         Button(
             onClick = {
                 // When the button is pressed, update queryResult
-                queryResult = queryText
+                queryResult = queryText;
+                handleQuery()
             }
         ) {
             Text(text = "Done")
         }
+        CostEstimatorRepo.writtenQuery= queryTokens.toMutableList();
 
         // Display queryResult when it's not empty
         if (queryResult.isNotEmpty()) {
             Text(text = queryResult)
             Log.d("tokens", "QueryScreen2: ${queryTokens}")
-            CostEstimatorRepo.writtenQuery= queryTokens.toMutableList()
             Log.d("writtenQuery", "QueryScreen2: ${CostEstimatorRepo.writtenQuery}")
         }
     }
