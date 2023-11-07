@@ -12,8 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import com.test.querycostapp.Repo.EmployeeRepo
-import com.test.querycostapp.Repo.LanguagePackageRepository
+import com.test.querycostapp.repo.EmployeeRepo
+import com.test.querycostapp.repo.ProjectRepo
 import com.test.querycostapp.ui.theme.QueryCostAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,7 +21,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val emps = EmployeeRepo.initEmployees(LocalContext.current)
-            Log.d("EMP", emps.map { it.toString() }.toString())
+            Log.d("EMP2", emps.map { it.Fname }.toString())
+
+            val projects = ProjectRepo.initProjects(LocalContext.current)
+            Log.d("EMP2", projects.map { it.ProjectName }.toString())
 
             QueryCostAppTheme {
                 // A surface container using the 'background' color from the theme
@@ -47,10 +50,8 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    val packages = LanguagePackageRepository.initPackages(LocalContext.current)
-    Log.d("PAC", "GreetingPreview: ${packages.map { it.title }}")
-    QueryCostAppTheme {
-        Greeting("Android: ${packages[0].title}")
+   QueryCostAppTheme {
+        Greeting("Android")
 
 
     }

@@ -1,9 +1,7 @@
-package com.test.querycostapp.Repo
+package com.test.querycostapp.repo
 
 import android.content.Context
-import android.util.Log
 import com.test.querycostapp.model.Employee
-import com.test.querycostapp.model.PackageItem
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
