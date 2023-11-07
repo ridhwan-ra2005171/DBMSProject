@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.test.querycostapp.repo.CostEstimatorRepo
 import com.test.querycostapp.repo.EmployeeRepo
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,6 +80,8 @@ fun QueryScreen2() {
         if (queryResult.isNotEmpty()) {
             Text(text = queryResult)
             Log.d("tokens", "QueryScreen2: ${queryTokens}")
+            CostEstimatorRepo.writtenQuery= queryTokens.toMutableList()
+            Log.d("writtenQuery", "QueryScreen2: ${CostEstimatorRepo.writtenQuery}")
         }
     }
 }
