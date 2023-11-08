@@ -1,5 +1,6 @@
 package com.example.dbmsphase2.view
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -24,47 +26,73 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.test.querycostapp.repo.CostEstimatorRepo
+import com.test.querycostapp.repo.CostEstimatorRepo.handleQuery
 import com.test.querycostapp.repo.EmployeeRepo
+import com.test.querycostapp.repo.ProjectRepo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QueryScreen2() {
-
-    var queryText by remember {mutableStateOf("")} //to store
-
+    var queryText by remember { mutableStateOf("") }
     var queryResult by remember { mutableStateOf("") }
+    var queryTokens = queryResult.split(Regex("\\s+")) // Tokenize by whitespace
+
+    CostEstimatorRepo.employees = EmployeeRepo.initEmployees(LocalContext.current).toMutableList()
+    CostEstimatorRepo.projects = ProjectRepo.initProjects(LocalContext.current).toMutableList()
 
 
-    Column (modifier = Modifier.fillMaxSize().padding(10.dp),
-        horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Textfield for query
+        OutlinedTextField(
+            value = queryText,
+            onValueChange = {
+                queryText = it
+            },
+            label = { Text("Query") },
+            placeholder = { Text("Enter Query") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    // When the "Done" button is pressed, update queryResult
+                    queryResult = queryText
+                }
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(1.dp, Color.Gray, MaterialTheme.shapes.small)
+                .padding(16.dp)
+        )
 
-            //textfield for query
-            OutlinedTextField(
-                value = queryText,
-                onValueChange = {
-                    queryText = it
-                },
-                label = { Text("Query") },
-                placeholder = { Text("Enter Query") },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = { /* Handle done action if needed */ }
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(1.dp, Color.Gray, MaterialTheme.shapes.small) // Add the border
-                    .padding(16.dp)
-            )
-            queryResult = queryText
+        // Button to trigger the action
+        Button(
+            onClick = {
+                // When the button is pressed, update queryResult
+                queryResult = queryText;
+                handleQuery()
+            }
+        ) {
+            Text(text = "Done")
+        }
+        CostEstimatorRepo.writtenQuery= queryTokens.toMutableList();
 
-        //result to display the query
-        Text(text = queryResult)
+        // Display queryResult when it's not empty
+        if (queryResult.isNotEmpty()) {
+            Text(text = queryResult)
+            Log.d("tokens", "QueryScreen2: ${queryTokens}")
+            Log.d("writtenQuery", "QueryScreen2: ${CostEstimatorRepo.writtenQuery}")
+        }
+    }
+}
 
-        //text for the result of query:
-        Text(text = "Result is here")
 
 
 //        val sampleData = listOf(
@@ -73,13 +101,12 @@ fun QueryScreen2() {
 //            Person("Charlie", 35, "charlie@example.com"),
 //            Person("David", 28, "david@example.com")
 //        )
-        //lazy column to list the results of the algorithms and sort them in descending order in terms of time
-        LazyColumn {
-
-        }
-        TableAppEmployee(EmployeeRepo.initEmployees(LocalContext.current))
-    }
-}
+//lazy column to list the results of the algorithms and sort them in descending order in terms of time
+//        LazyColumn {
+//
+//        }
+//        TableAppEmployee(EmployeeRepo.initEmployees(LocalContext.current))
+//        Log.d("QueryScreen2", "QueryScreen2: ${EmployeeRepo.initEmployees(LocalContext.current)}")
 
 @Preview
 @Composable
