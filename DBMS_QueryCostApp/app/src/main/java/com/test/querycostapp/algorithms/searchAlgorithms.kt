@@ -1,52 +1,28 @@
 package com.test.querycostapp.algorithms
 
 import com.test.querycostapp.model.Employee
+import com.test.querycostapp.repo.EmpMetaRepo
 import kotlin.math.ceil
 import kotlin.math.log2
 
 object searchAlgorithms{
 
 
-
-// S1 - Linear Search (brute force) approach
-fun linearSearch(attribute : String, value: String, table : List<Any>, equality : Boolean) : Int {
-    // get the number of blocks of the table
-    var blockCount: Int = if (table[0] is Employee) {
-        // get the block count for Employee from the metadata
-        return 0
-    } else {
-        // get the block count for Project from the metadata
-        return 0
+    // S1 - Linear Search (brute force) approach 
+    // if select is EQUALITY and KEY, cost = b/2
+    // if select is EQUALITY and NON-KEY, cost = b
+    // if select is RANGE, cost = b
+    fun S1LinearSearch(notFound : Boolean, unique : Boolean, equality : Boolean, blockCount : Int) : Double {
+        // assign blockCount to cost
+        var cost = blockCount.toDouble()
+        // if the select is NOT an equality, the attribute is not unique i.e. non key, or the record doesn't exist; return the number of blocks i.e. the cost
+        if (!equality or !unique or notFound) {
+            return cost
+        } else {
+            // if the select is an equality, the attribute is unique and the record exists; return HALF of the number of blocks i.e. cost/2
+            return cost / 2
+        }
     }
-
-    // assign blockCount to cost
-    var cost = blockCount
-
-    // if the select is NOT an equality, return all the number of blocks i.e. the cost
-    if (!equality) {
-        return cost
-    }
-    // If the select is equality, check if the attribute is a key or non-key
-    // if the attribute is a key and the value exists in the table, return half of the number of blocks as per the formula in the book
-//    if (attributevalueExists) {
-//
-//    }
-    // if record doesn't exist in table, return b
-    // call the valueExists function to check if the record exists in the table
-
-    // find if the records exists in table
-    // Retrieve all records: Cost = b
-//    val exists = table.contains()
-
-    // If the record is not in the table, then search the whole table
-    // meaning search all the blocks
-    // otherwise the cost is searching half of the blocks
-
-
-
-    return 0
-
-}
 
 
 
@@ -66,4 +42,16 @@ fun linearSearch(attribute : String, value: String, table : List<Any>, equality 
         }
     }
 
+    // S4—Using an ordering index to retrieve multiple records.
+    // This algorithm is only applicable to a KEY attribute with INDEX and for RANGE queries
+    // ------------------------ From the Book ------------------------------------------------------
+    // If the comparison condition is >, >=, <, or <= on a key field with an ordering index, roughly
+    // half the file records will satisfy the condition. This gives a cost function of
+    // CS4 = x + (b/2). This is a very rough estimate, and although it may be correct
+    // on the average, it may be inaccurate in individual cases. A more accurate
+    // estimate is possible if the distribution of records is stored in a histogram
+    //----------------------------------------------------------------------------------------------
+    fun S4IndexForMultipleRecords(indexLevel: Int, blockCount: Int): Double {
+        return indexLevel.toDouble() + ((blockCount.toDouble()) / 2)
+    }
 }
