@@ -1,0 +1,16 @@
+[
+  {
+    "ProjectNo": 101,
+    "ProjectName": "Building Construction",
+    "Description": "Construction of a new office building",
+    "ProjectLoc": "City Center",
+    "ManagedBy": "6789"
+  },
+  {
+    "ProjectNo": 102,
+    "ProjectName": "Software Development",
+    "Description": "Development of a new software application",
+    "ProjectLoc": "Tech Park",
+    "ManagedBy": "5678"
+  }
+]

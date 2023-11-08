@@ -1,0 +1,22 @@
+[
+    {
+        "tableName": "EMPLOYEE",
+        "rowFormat": "dynamic",
+        "columnCount": 11,
+        "rowCount": 30,
+        "avgRowLength": 410,
+        "dataLength": 12300,
+        "blockCount": 13,
+        "bfr": 2
+    },
+    {
+        "tableName": "PROJECT",
+        "rowFormat": "dynamic",
+        "columnCount": 5,
+        "rowCount": 5,
+        "avgRowLength": 418,
+        "dataLength": 2090,
+        "blockCount": 3,
+        "bfr": 1
+    }
+]

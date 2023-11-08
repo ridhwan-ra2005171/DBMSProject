@@ -1,0 +1,47 @@
+[
+    {
+        "ProjAttribute": "ProjectNo",
+        "Type": "int",
+        "Unique": true,
+        "indexName": "Project_projectNo",
+        "Selectivity": 0.2,
+        "selectionCardinality": 1,
+        "NDV": 5
+    },
+    {
+        "ProjAttribute": "ProjectName",
+        "Type": "varchar",
+        "Unique": false,
+        "indexName": null,
+        "Selectivity": 0.2,
+        "selectionCardinality": 1,
+        "NDV": 5
+    },
+    {
+        "ProjAttribute": "Description",
+        "Type": "text",
+        "Unique": false,
+        "indexName": null,
+        "Selectivity": 0.2,
+        "selectionCardinality": 1,
+        "NDV": 5
+    },
+    {
+        "ProjAttribute": "ProjectLoc",
+        "Type": "varchar",
+        "Unique": false,
+        "indexName": null,
+        "Selectivity": 0.2,
+        "selectionCardinality": 1,
+        "NDV": 5
+    },
+    {
+        "ProjAttribute": "ManagedBy",
+        "Type": "varchar",
+        "Unique": false,
+        "indexName": "Project_managedBy",
+        "Selectivity": 0.5,
+        "selectionCardinality": 2.5,
+        "NDV": 2
+    }
+]

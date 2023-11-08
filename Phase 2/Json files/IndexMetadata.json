@@ -1,0 +1,46 @@
+[
+    {
+        "indexName": "Employee_SSN",
+        "Index": "primary",
+        "indexType": "btree",
+        "unique": true,
+        "level": 1,
+        "selectivity": 0.033333333,
+        "selectionCardinality": 1,
+        "cardinality": 30,
+        "firstLevelBlockCount": 3
+    },
+    {
+        "indexName": "Employee_managerSSN",
+        "Index": "secondary",
+        "indexType": "btree",
+        "unique": false,
+        "level": 1,
+        "selectivity": 0.25,
+        "selectionCardinality": 7.5,
+        "cardinality": 4,
+        "firstLevelBlockCount": 1
+    },
+    {
+        "indexName": "Project_projectNo",
+        "Index": "Primary",
+        "indexType": "btree",
+        "unique": true,
+        "level": 1,
+        "selectivity": 0.2,
+        "selectionCardinality": 1,
+        "cardinality": 5,
+        "firstLevelBlockCount": 1
+    },
+    {
+        "indexName": "Project_managedBy",
+        "Index": "secondary",
+        "indexType": "btree",
+        "unique": false,
+        "level": 1,
+        "selectivity": 0.5,
+        "selectionCardinality": 2.5,
+        "cardinality": 2,
+        "firstLevelBlockCount": 1
+    }
+]
