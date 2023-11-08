@@ -8,7 +8,7 @@ import kotlin.math.log2
 object searchAlgorithms{
 
 
-    // S1 - Linear Search (brute force) approach 
+    // S1 - Linear Search (brute force) approach
     // if select is EQUALITY and KEY, cost = b/2
     // if select is EQUALITY and NON-KEY, cost = b
     // if select is RANGE, cost = b
