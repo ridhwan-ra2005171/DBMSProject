@@ -5,7 +5,7 @@ import androidx.core.graphics.component1
 import com.test.querycostapp.model.Employee
 import com.test.querycostapp.model.Project
 
-object CostEstimatorRepo{
+object CostEstimatorRepo {
 
 
     var writtenQuery = mutableListOf<String>() //will be passed when Done is entered
@@ -14,38 +14,47 @@ object CostEstimatorRepo{
 
     fun handleQuery() {
 //        Log.d("Operator", "handleQuery: ${writtenQuery[0]}")
-          Log.d("employees", "${employees} ")
+        Log.d("employees", "${employees} ")
 //        Log.d("projects", "${projects} ")
 
+        if (writtenQuery.size > 1) { //dont delete this if statement, or else we get error index
 
-        //just testing via hardcoding (press the button)
-//        val (index) = binarySearchEmployee(employees, writtenQuery[7]) //SELECT * FROM Employee WHERE SSN = 1234
-//        if (index != -1) {
-//            val employee = employees[index]
-//            Log.d("Founded", "${employee}")
-//        } else {
-//            Log.d("Founded", "Employee with SSN ${writtenQuery[7]} not found")
-//        }
+
+            Log.d("query", "${writtenQuery[7]} ")
+            Log.d("query", "${employees[0].SSN} ")
+
+            //just testing via hardcoding (press the button) [binary search working]
+            Log.d("S2", "${writtenQuery[7]}")
+            val (index) = binarySearchEmployee(
+                employees,
+                writtenQuery[7]
+            ) //SELECT * FROM Employee WHERE SSN = 2345
+            if (index != -1) { //if employee is found
+                val employee = employees[index]
+                Log.d("S2", "${employee}")
+            } else {
+                Log.d("S2", "Employee with SSN ${writtenQuery[7]} not found")
+            }
+        }
+
 
         //OPERATOR SELECT
-        if (writtenQuery[0].equals("SELECT", ignoreCase = true)){
+        if (writtenQuery[0].equals("SELECT", ignoreCase = true)) {
             Log.d("Operator", "handleQuery: Selectooooo")
 
             //TABLE EMPLOYEE
-            if (writtenQuery[3].equals("EMPLOYEE", ignoreCase = true)){
+            if (writtenQuery[3].equals("EMPLOYEE", ignoreCase = true)) {
 
 
                 //TABLE PROJECT
-            }else if (writtenQuery[3].equals("PROJECT", ignoreCase = true)){
+            } else if (writtenQuery[3].equals("PROJECT", ignoreCase = true)) {
 
             }
 
 
             //OPERATOR JOIN
-        }else if (writtenQuery[0].equals("JOIN", ignoreCase = true)){
+        } else if (writtenQuery[0].equals("JOIN", ignoreCase = true)) {
             Log.d("Operator", "handleQuery: Joinoooo")
-
-
 
 
         }
@@ -61,18 +70,22 @@ object CostEstimatorRepo{
 
 
     //S2 binary Search //target = either ssn or projectNo (only specific single value)
-        fun binarySearchEmployee(arr: MutableList<Employee>, targetSSN: String): Int {
+    fun binarySearchEmployee(arr: MutableList<Employee>, targetSSN: String): Int {
+        Log.d("S2", "binarySearchEmployee called ")
         var left = 0
         var right = arr.size - 1
 
         while (left <= right) {
             val mid = left + (right - left) / 2
+            val midSSN = arr[mid].SSN // Add this line to log the mid SSN
 
-            if (arr[mid].SSN == targetSSN) {
+            Log.d("S2", "Checking SSN at index $mid: $midSSN")
+
+            if (midSSN == targetSSN) {
                 return mid // Employee found, return their index
             }
 
-            if (arr[mid].SSN < targetSSN) {
+            if (midSSN < targetSSN) {
                 left = mid + 1 // Target is in the right half
             } else {
                 right = mid - 1 // Target is in the left half

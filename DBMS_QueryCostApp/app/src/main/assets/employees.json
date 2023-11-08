@@ -26,32 +26,6 @@
     "ManagerSSN": null
   },
   {
-    "SSN": "5678",
-    "Fname": "Carlos",
-    "Minit": "J",
-    "Lname": "Lopez",
-    "DOB": "1991-03-12",
-    "Address": "678 Cedar St",
-    "Gender": "Male",
-    "PhoneNo": "555-567-8901",
-    "HireDate": "2016-09-30",
-    "Manager": true,
-    "ManagerSSN": null
-  },
-  {
-    "SSN": "6789",
-    "Fname": "Lina",
-    "Minit": "S",
-    "Lname": "Martinez",
-    "DOB": "1995-11-05",
-    "Address": "789 Birch St",
-    "Gender": "Female",
-    "PhoneNo": "555-678-9012",
-    "HireDate": "2019-06-22",
-    "Manager": true,
-    "ManagerSSN": null
-  },
-  {
     "SSN": "3456",
     "Fname": "James",
     "Minit": "M",
@@ -76,5 +50,32 @@
     "HireDate": "2018-04-15",
     "Manager": false,
     "ManagerSSN": "6789"
+  },
+  {
+    "SSN": "5678",
+    "Fname": "Carlos",
+    "Minit": "J",
+    "Lname": "Lopez",
+    "DOB": "1991-03-12",
+    "Address": "678 Cedar St",
+    "Gender": "Male",
+    "PhoneNo": "555-567-8901",
+    "HireDate": "2016-09-30",
+    "Manager": true,
+    "ManagerSSN": null
+  },
+  {
+    "SSN": "6789",
+    "Fname": "Lina",
+    "Minit": "S",
+    "Lname": "Martinez",
+    "DOB": "1995-11-05",
+    "Address": "789 Birch St",
+    "Gender": "Female",
+    "PhoneNo": "555-678-9012",
+    "HireDate": "2019-06-22",
+    "Manager": true,
+    "ManagerSSN": null
   }
+
 ]
