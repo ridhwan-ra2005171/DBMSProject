@@ -1,9 +1,145 @@
 package com.test.querycostapp.repo
 
+import android.provider.Settings.NameValueTable
 import android.util.Log
 import androidx.core.graphics.component1
 import com.test.querycostapp.model.Employee
 import com.test.querycostapp.model.Project
+import java.text.AttributedCharacterIterator.Attribute
+
+fun valueExists(targetValue : String, targetAttribute: String, table: List<Any>) : Boolean {
+    var exists = false
+    val targetAttribute = targetAttribute.lowercase()
+    var tempTable: List<String> = listOf()
+    // map the table to a list of attributes depending on the attribute type
+    if (table[0] is Employee) {
+        table as MutableList<Employee> // Convert the list<Any> to list<Employee>
+        // make temporary table to store the values
+        tempTable = when (targetAttribute) {
+            "ssn" -> table.map { it.SSN }
+            "fname" -> table.map { it.Fname }
+            "minit" -> table.map { it.Minit }
+            "lname" -> table.map { it.Lname }
+            "dob" -> table.map { it.DOB }
+            "address" -> table.map { it.Address }
+            "gender" -> table.map { it.Gender }
+            "phoneno" -> table.map { it.PhoneNo }
+            "hiredate" -> table.map { it.HireDate }
+            "manager" -> table.map { it.Manager.toString() }
+            "managerssn" -> table.map { it.ManagerSSN.toString()}
+            else -> table.map { it.toString() }
+        }
+    } else {
+        table as MutableList<Project> // Convert the list<Any> to list<Project>
+        // make temporary table to store the values
+        tempTable = when (targetAttribute) {
+            "projectno" -> table.map { it.ProjectNo.toString() }
+            "projectname" -> table.map { it.ProjectName }
+            "description" -> table.map { it.Description }
+            "projectloc" -> table.map { it.ProjectLoc }
+            "managedby" -> table.map { it.ManagedBy }
+            else -> table.map { it.toString() }
+        }
+    }
+    // now that we have a list of values of the type of the targetAttribute
+    // find the value in that list
+    exists = tempTable.contains(targetValue)
+    return exists
+}
+
+fun attributeExists(targetAttribute: String, table: List<Any>) : Boolean {
+    var exists = false
+    val targetAttribute = targetAttribute.lowercase()
+    if (table[0] is Employee) {
+        table as MutableList<Employee> // Convert the list<Any> to list<Employee>
+        // Convert the first employee to a string, then search through the string if the target attribute exists in that string
+        exists = table[0].toString().lowercase().contains(targetAttribute)
+    } else {
+        table as MutableList<Project> // Convert the list<Any> to list<Project>
+        // Convert the first project to a string, then search through the string if the target attribute exists in that string
+        exists = table[0].toString().lowercase().contains(targetAttribute)
+    }
+    return exists
+}
+
+fun main(args: Array<String>) {
+    val testListEmp = listOf(
+        Employee(
+            "123",
+            "Mohammed",
+            "A",
+            "Ali",
+            "1990-05-15",
+            "123 Main St",
+            "Male",
+            "555-123-4567",
+            "2015-03-20",
+            false,
+            null
+        ),
+        Employee(
+            "234",
+            "Lea",
+            "R",
+            "Garcia",
+            "1988-09-10",
+            "456 Elm St",
+            "Female",
+            "555-234-5678",
+            "2016-02-12",
+            false,
+            null
+        ),
+        Employee(
+            "345",
+            "Lina",
+            "S",
+            "Martinez",
+            "1995-11-05",
+            "789 Birch St",
+            "Female",
+            "555-345-6789",
+            "2019-06-22",
+            false,
+            null
+        ),
+        Employee(
+            "456",
+            "Lina",
+            "S",
+            "Martinez",
+            "1995-11-05",
+            "789 Birch St",
+            "Female",
+            "555-345-6789",
+            "2019-06-22",
+            false,
+            null
+        )
+    )
+    val testListProject = listOf<Project>(
+        Project(
+            101,
+            "Project1",
+            "Description",
+            "123 Main St",
+            "6789"
+        ),
+        Project(
+            102,
+            "Project2",
+            "Description",
+            "789 Birch St",
+            "5678"
+        ),
+    )
+
+    println(valueExists("123", "SsN", testListEmp ))
+    println(attributeExists("PrOjEctno",testListProject))
+
+}
+
+
 
 object CostEstimatorRepo {
 
