@@ -113,15 +113,6 @@ fun QueryScreen2() {
 fun QueryScreen2Preview() {
     QueryScreen2()
 
-    //if its on binary S2:
-//    log2b + ceil[ (s/bfr)] -1 fileblocks
-//            reduces to log2b if equality condition is on unique key / attribute. ( just make s=1 when its on unique)
 
-
-    //for S6 there are 4 scenarios
-
-
-//    J3 sortmerge:
-//    Br + Bs +((joinselectivity * |R| * |S|)/bfr of RS
 
 }
