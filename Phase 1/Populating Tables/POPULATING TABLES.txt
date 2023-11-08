@@ -32,6 +32,11 @@ VALUES
     ('1234', 60000.00),
     ('2345', 55000.00);
 
+
+
+
+
+
 -- Insert sample data into Trade_Union table
 INSERT INTO Trade_Union (UnionID, UnionName, UnionAddress)
 VALUES
