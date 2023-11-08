@@ -26,10 +26,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.test.querycostapp.model.EmployeeMetadata
 import com.test.querycostapp.repo.CostEstimatorRepo
 import com.test.querycostapp.repo.CostEstimatorRepo.handleQuery
+import com.test.querycostapp.repo.EmpMetaRepo
 import com.test.querycostapp.repo.EmployeeRepo
+import com.test.querycostapp.repo.IndexMetaRepo
+import com.test.querycostapp.repo.ProjMetaRepo
 import com.test.querycostapp.repo.ProjectRepo
+import com.test.querycostapp.repo.TablesMetaRepo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,6 +45,12 @@ fun QueryScreen2() {
 
     CostEstimatorRepo.employees = EmployeeRepo.initEmployees(LocalContext.current).toMutableList()
     CostEstimatorRepo.projects = ProjectRepo.initProjects(LocalContext.current).toMutableList()
+    //----
+    //these will call the metadatas json and store them in the list under CostEstimator repo
+    CostEstimatorRepo.tableMetadatas = TablesMetaRepo.initTablesMetadatas(LocalContext.current).toMutableList()
+    CostEstimatorRepo.EmpMetadatas = EmpMetaRepo.initEmployeeMetadatas(LocalContext.current).toMutableList()
+    CostEstimatorRepo.projectMetadatas = ProjMetaRepo.initProjectMetadatas(LocalContext.current).toMutableList()
+    CostEstimatorRepo.indexMetadatas = IndexMetaRepo.initIndexMetadatas(LocalContext.current).toMutableList()
 
 
     Column(

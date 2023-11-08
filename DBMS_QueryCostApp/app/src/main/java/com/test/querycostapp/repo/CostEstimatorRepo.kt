@@ -4,7 +4,11 @@ import android.provider.Settings.NameValueTable
 import android.util.Log
 import androidx.core.graphics.component1
 import com.test.querycostapp.model.Employee
+import com.test.querycostapp.model.EmployeeMetadata
+import com.test.querycostapp.model.IndexMetadata
 import com.test.querycostapp.model.Project
+import com.test.querycostapp.model.ProjectMetadata
+import com.test.querycostapp.model.TablesMetadata
 import java.text.AttributedCharacterIterator.Attribute
 
 fun valueExists(targetValue : String, targetAttribute: String, table: List<Any>) : Boolean {
@@ -147,6 +151,10 @@ object CostEstimatorRepo {
     var writtenQuery = mutableListOf<String>() //will be passed when Done is entered
     var employees = mutableListOf<Employee>() //will be passed when Done is entered
     var projects = mutableListOf<Project>() //will be passed when Done is entered
+    var EmpMetadatas = mutableListOf<EmployeeMetadata>() //will be passed when Done is entered
+    var projectMetadatas = mutableListOf<ProjectMetadata>() //will be passed when Done is entered
+    var tableMetadatas = mutableListOf<TablesMetadata>() //will be passed when Done is entered
+    var indexMetadatas = mutableListOf<IndexMetadata>() //will be passed when Done is entered
 
     fun handleQuery() {
 //        Log.d("Operator", "handleQuery: ${writtenQuery[0]}")
@@ -231,9 +239,7 @@ object CostEstimatorRepo {
         return -1 // Employee not found
     }
 
-    //if its on binary S2:
-//    log2b + ceil[ (s/bfr)] -1 fileblocks
-//            reduces to log2b if equality condition is on unique key / attribute. ( just make s=1 when its on unique)
+
 
 
     //for S6 there are 4 scenarios

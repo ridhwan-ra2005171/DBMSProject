@@ -1,6 +1,12 @@
 package com.test.querycostapp.algorithms
 
 import com.test.querycostapp.model.Employee
+import kotlin.math.ceil
+import kotlin.math.log2
+
+object searchAlgorithms{
+
+
 
 // S1 - Linear Search (brute force) approach
 fun linearSearch(attribute : String, value: String, table : List<Any>, equality : Boolean) : Int {
@@ -39,5 +45,25 @@ fun linearSearch(attribute : String, value: String, table : List<Any>, equality 
 
 
     return 0
+
+}
+
+
+
+
+    //S2 - Binary Search
+    //if its on binary S2:
+//    log2b + ceil[ (s/bfr)] -1 fileblocks
+//            reduces to log2b if equality condition is on unique key / attribute. ( just make s=1 when its on unique)
+
+    fun S2BinarySearchCost(b: Int, s: Double, bfr: Int): Double {
+        return if (s == 1.0) {
+            // When s is 1 (equality on a unique key attribute)
+            log2(b.toDouble())
+        } else {
+            // For other scenarios
+            log2(b.toDouble()) + ceil(s / bfr) - 1
+        }
+    }
 
 }
