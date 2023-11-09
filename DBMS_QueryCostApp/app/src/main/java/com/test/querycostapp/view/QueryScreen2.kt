@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -26,7 +25,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.test.querycostapp.model.EmployeeMetadata
 import com.test.querycostapp.repo.CostEstimatorRepo
 import com.test.querycostapp.repo.CostEstimatorRepo.handleQuery
 import com.test.querycostapp.repo.EmpMetaRepo
@@ -48,10 +46,11 @@ fun QueryScreen2() {
     //----
     //these will call the metadatas json and store them in the list under CostEstimator repo
     CostEstimatorRepo.tableMetadatas = TablesMetaRepo.initTablesMetadatas(LocalContext.current).toMutableList()
-    CostEstimatorRepo.EmpMetadatas = EmpMetaRepo.initEmployeeMetadatas(LocalContext.current).toMutableList()
+    CostEstimatorRepo.empMetadatas = EmpMetaRepo.initEmployeeMetadatas(LocalContext.current).toMutableList()
     CostEstimatorRepo.projectMetadatas = ProjMetaRepo.initProjectMetadatas(LocalContext.current).toMutableList()
     CostEstimatorRepo.indexMetadatas = IndexMetaRepo.initIndexMetadatas(LocalContext.current).toMutableList()
 
+    Log.d("METADATA", CostEstimatorRepo.tableMetadatas.toString())
 
     Column(
         modifier = Modifier
