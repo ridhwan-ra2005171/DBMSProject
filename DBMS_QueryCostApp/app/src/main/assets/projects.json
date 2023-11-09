@@ -12,5 +12,26 @@
     "Description": "Development of a new software application",
     "ProjectLoc": "Tech Park",
     "ManagedBy": "5678"
+  },
+  {
+    "ProjectNo": 103,
+    "ProjectName": "Marketing Campaign",
+    "Description": "Launch a new marketing campaign",
+    "ProjectLoc": "Downtown",
+    "ManagedBy": "6789"
+  },
+  {
+    "ProjectNo": 104,
+    "ProjectName": "Product Launch",
+    "Description": "Launching a new product line",
+    "ProjectLoc": "Business District",
+    "ManagedBy": "5678"
+  },
+  {
+    "ProjectNo": 105,
+    "ProjectName": "Research & Development",
+    "Description": "Research and development of new technologies",
+    "ProjectLoc": "Tech Hub",
+    "ManagedBy": "6789"
   }
 ]
