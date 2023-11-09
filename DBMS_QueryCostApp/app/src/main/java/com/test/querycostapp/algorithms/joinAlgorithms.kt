@@ -1,5 +1,9 @@
 package com.test.querycostapp.algorithms
 
+import java.lang.Math.log
+import kotlin.math.log
+import kotlin.math.roundToInt
+
 object joinAlgorithms {
 
     // J1—Nested-loop join
@@ -58,9 +62,44 @@ object joinAlgorithms {
 
     // J3—Sort-merge join
 
+//    CJ3a = bR + bS + ((js * |R| * |S|)/bfrRS)
+        //if sorting is needed on join attribute => add (2 * b) + (2 * b * (logdM nR))
+fun J3SortMergeJoinCost(
+    bR: Int, // Number of blocks in the outer table
+    bS: Int, // Number of blocks in the inner table
+    js: Double, // Join cardinality
+    R: Int, // Number of records in the outer table
+    S: Int, // Number of records in the inner table
+    bfrRS: Int, // Blocking factor of R and S
+    sortingNeeded: Boolean // Whether sorting is needed on join attribute
+): Double {
+    // CJ3a = bR + bS + ((js * R * S) / bfrRS)
+    val CJ3a = bR + bS + (js * R * S) / bfrRS.toDouble()
+
+    return if (sortingNeeded) {
+        // If sorting is needed, add (2 * b) + (2 * b * (logdM nR))
+        val dM = 10 // Assuming dM (M-way merge) is a constant value
+        val nR = R + S // Combined number of records in R and S
+
+        CJ3a + (2 * bR) + (2 * bR * log(dM.toDouble(), nR.toDouble())).roundToInt().toDouble()
+    } else {
+        // If sorting is not needed, return CJ3a as the cost
+        CJ3a
+    }
+}
+
+
+
+
+
+
+
 
 
     // J4—Partition–hash join (or just hash join)
+    //
+
+
 }
 
 // Testing join algorithms
@@ -77,5 +116,17 @@ fun main(args: Array<String>) {
         innnerSelectioCard = 1.0, hasClusterIndex = false, hasSecondaryIndex = false, hasHashIndex = true
     )
     println("J2 Index-based nested-loop join: \n$j2")
+
+
+    //J3 - Sort-merge join
+    val j3Cost1 = joinAlgorithms.J3SortMergeJoinCost(
+        bR = 2000, bS = 125, js = (1.0/125.0), R = 10000, S = 125, bfrRS = 4, sortingNeeded = true
+    )
+    println("J3 Sort-merge join not sorted: \n$j3Cost1")
+    val j3Cost2 = joinAlgorithms.J3SortMergeJoinCost(
+        bR = 2000, bS = 125, js = (1.0/125.0), R = 10000, S = 125, bfrRS = 4, sortingNeeded = false
+    )
+    println("J3 Sort-merge join sorted: \n$j3Cost2")
+
 
 }

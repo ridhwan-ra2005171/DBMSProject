@@ -22,15 +22,15 @@
 ////import kotlinx.android.synthetic.main.activity_main.*
 //import kotlin.random.Random
 //
-////@Composable
-////fun TableExample(persons: List<Person>) {
-////    TableHeader()
-////    LazyColumn {
-////        items(persons) { person ->
-////            TableRow(person)
-////        }
-////    }
-////}
+//@Composable
+//fun TableExample(persons: List<Person>) {
+//    TableHeader()
+//    LazyColumn {
+//        items(persons) { person ->
+//            TableRow(person)
+//        }
+//    }
+//}
 //
 //@Composable
 //fun TableHeader() {
@@ -78,31 +78,31 @@
 //    }
 //}
 //
-////class MyViewModel : ViewModel() {
-////    private val _persons = MutableLiveData(initialData())
-////    val persons: LiveData<List<Person>> = _persons
-////
-////    private fun initialData(): List<Person> {
-////        return List(5) {
-////            Person("Person $it", Random.nextInt(18, 60), "person$it@example.com")
-////        }
-////    }
-////
-////    fun shuffleData() {
-////        _persons.value = _persons.value?.shuffled()
-////    }
-////}
+//class MyViewModel : ViewModel() {
+//    private val _persons = MutableLiveData(initialData())
+//    val persons: LiveData<List<Person>> = _persons
 //
-////@Preview
-////@Composable
-////fun previewTableApp() {
-//////    TableApp(emptyList(), MyViewModel())
-//////    val viewModel: MyViewModel = viewModel()
-////    val sampleData = listOf(
-////        Person("Alice", 30, "alice@example.com"),
-////        Person("Bob", 25, "bob@example.com"),
-////        Person("Charlie", 35, "charlie@example.com"),
-////        Person("David", 28, "david@example.com")
-////    )
-////    TableApp(sampleData)
-////}
+//    private fun initialData(): List<Person> {
+//        return List(5) {
+//            Person("Person $it", Random.nextInt(18, 60), "person$it@example.com")
+//        }
+//    }
+//
+//    fun shuffleData() {
+//        _persons.value = _persons.value?.shuffled()
+//    }
+//}
+//
+//@Preview
+//@Composable
+//fun previewTableApp() {
+////    TableApp(emptyList(), MyViewModel())
+////    val viewModel: MyViewModel = viewModel()
+//    val sampleData = listOf(
+//        Person("Alice", 30, "alice@example.com"),
+//        Person("Bob", 25, "bob@example.com"),
+//        Person("Charlie", 35, "charlie@example.com"),
+//        Person("David", 28, "david@example.com")
+//    )
+//    TableApp(sampleData)
+//}
