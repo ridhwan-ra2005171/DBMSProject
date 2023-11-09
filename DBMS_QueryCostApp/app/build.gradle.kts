@@ -72,5 +72,9 @@ dependencies {
     //    kotlin serialization
     // LOOK LINE 4
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+    // navigation
+    implementation("androidx.navigation:navigation-compose:2.6.0")
+    //icons extended
+    implementation("androidx.compose.material:material-icons-extended:1.4.3")
 
 }
