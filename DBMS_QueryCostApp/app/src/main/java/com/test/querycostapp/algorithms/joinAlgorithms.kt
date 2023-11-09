@@ -1,14 +1,20 @@
 package com.test.querycostapp.algorithms
 
 import java.lang.Math.log
+import kotlin.math.ceil
 import kotlin.math.log
 import kotlin.math.roundToInt
 
 object joinAlgorithms {
 
     // J1—Nested-loop join
-    fun J1NestedLoopJoinCost() : Double{
-        return 0.0
+    fun J1NestedLoopJoinCost(bR: Int, bS: Int, js: Double, R: Int, S: Int, bfrRS: Int, nB: Int) : Double{
+        val CJ1 = if(nB == 3){
+            bR + (bR * bS) + (js * R * S) / bfrRS.toDouble()
+        }else{
+            bR + (ceil((bR/(nB-2)).toDouble()) * bS) + (js * R * S) / bfrRS.toDouble()
+        }
+        return CJ1
     }
 
 
@@ -92,17 +98,11 @@ fun J3SortMergeJoinCost(
 }
 
 
-
-
-
-
-
-
-
     // J4—Partition–hash join (or just hash join)
     //
-    fun J4PartitionHashJoin(): Double{
-        return 0.0
+    fun J4PartitionHashJoin(bR: Int, bS: Int, js: Double, R: Int, S: Int, bfrRS: Int): Double{
+        val CJ4 = 3 * (bR + bS) + (js * R * S) / bfrRS.toDouble()
+        return CJ4
     }
 
 }
