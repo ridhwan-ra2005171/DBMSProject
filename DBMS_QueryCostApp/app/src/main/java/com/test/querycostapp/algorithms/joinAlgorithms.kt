@@ -7,6 +7,9 @@ import kotlin.math.roundToInt
 object joinAlgorithms {
 
     // J1—Nested-loop join
+    fun J1NestedLoopJoinCost() : Double{
+        return 0.0
+    }
 
 
     //J2—Index-based nested-loop join (using an access structure to retrieve the matching record(s))
@@ -98,7 +101,9 @@ fun J3SortMergeJoinCost(
 
     // J4—Partition–hash join (or just hash join)
     //
-
+    fun J4PartitionHashJoin(): Double{
+        return 0.0
+    }
 
 }
 

@@ -211,6 +211,7 @@ object CostEstimatorRepo {
 
             //OPERATOR JOIN
         } else if (writtenQuery[0].equals("JOIN", ignoreCase = true)) {
+            // join format: JOIN "table1, table2" WHERE "Condition", #buffers
             Log.d("Operator", "handleQuery: Joinoooo")
 
 

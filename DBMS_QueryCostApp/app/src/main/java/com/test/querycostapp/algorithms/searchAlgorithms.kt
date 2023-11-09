@@ -42,6 +42,10 @@ object searchAlgorithms{
         }
     }
 
+    fun S3bHashKeySelectCost(): Double{
+        return 0.0
+    }
+
     // S4—Using an ordering index to retrieve multiple records.
     // This algorithm is only applicable to a KEY attribute with INDEX and for RANGE queries
     // ------------------------ From the Book ------------------------------------------------------
