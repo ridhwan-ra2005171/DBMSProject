@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,8 +38,8 @@ import com.test.querycostapp.repo.TablesMetaRepo
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QueryScreen2() {
-    var queryText by remember { mutableStateOf("") }
-    var queryResult by remember { mutableStateOf("") }
+    var queryText by rememberSaveable { mutableStateOf("") }
+    var queryResult by rememberSaveable { mutableStateOf("") }
     var queryTokens = queryResult.split(Regex("\\s+")) // Tokenize by whitespace
 
     CostEstimatorRepo.employees = EmployeeRepo.initEmployees(LocalContext.current).toMutableList()
