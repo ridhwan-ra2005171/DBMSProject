@@ -158,6 +158,17 @@ object CostEstimatorRepo {
     var tableMetadatas = mutableListOf<TablesMetadata>() //will be passed when Done is entered
     var indexMetadatas = mutableListOf<IndexMetadata>() //will be passed when Done is entered
 
+    // From table metadata ------------------------------------------------------------------------------------
+    var empBfr = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.bfr
+    var projBfr = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.bfr
+
+    var empBlk = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.blockCount
+    var projBlk = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.blockCount
+
+    var empRowCount = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.rowCount
+    var projRowCount = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.rowCount
+
+
     fun handleQuery() {
 //        Log.d("Operator", "handleQuery: ${writtenQuery[0]}")
         Log.d("employees", "${employees} ")
