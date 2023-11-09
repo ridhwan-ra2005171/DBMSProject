@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ProjectMetadata(
-    val Attribute: String,
+    val ProjAttribute: String,
     val Type: String,
     val Unique: Boolean,
     val indexName: String?, //could be null
