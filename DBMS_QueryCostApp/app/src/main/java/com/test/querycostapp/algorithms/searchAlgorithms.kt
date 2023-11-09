@@ -43,7 +43,7 @@ object searchAlgorithms{
     }
 
     fun S3bHashKeySelectCost(): Double{
-        return 0.0
+        return 1.0
     }
 
     // S4—Using an ordering index to retrieve multiple records.
