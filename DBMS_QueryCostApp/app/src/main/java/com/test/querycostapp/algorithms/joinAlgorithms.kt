@@ -33,26 +33,26 @@ object joinAlgorithms {
         // J2b - Clustering index
         // CJ2b = bR + (|R| * (xB + (sB/bfrB))) + (( js * |R| * |S|)/bfrRS)
         if (hasClusterIndex) {
-            c2 = outerBlockCount * ( outerRowCount * ( innerIndexLevel + (innnerSelectioCard / bfr))) + term3
+            c2 = outerBlockCount + ( outerRowCount * ( innerIndexLevel + (innnerSelectioCard / bfr))) + term3
         }
 
         // J2c - Primary index
         // CJ2c = bR + (|R| * (xB + 1)) + ((js * |R| * |S|)/bfrRS)
         if (hasPrimaryIndex) {
-            c3 = outerBlockCount * ( outerRowCount * ( innerIndexLevel + 1)) + term3
+            c3 = outerBlockCount + ( outerRowCount * ( innerIndexLevel + 1)) + term3
         }
 
         // J2d - Hash index
-        // CJ2d = bR + (|R| * (xB + 1)) + ((js * |R| * |S|)/bfrRS)
+        // CJ2d = bR + (|R| * h) + ((js * |R| * |S|)/bfrRS)
         // h is the average number of block accesses to retrieve a record, given its hash key value
-        val h = 1.0
+        val h = 1.2
         // if there is a hash index AND if the outer table has hash index OR the inner table has hash index
         if (hasHashIndex || !(outerHashValue == 0.0 && innerHashValue == 0.0)) {
-            c4 = outerBlockCount * ( outerRowCount * ( innerIndexLevel + 1)) + term3
+            c4 = outerBlockCount + ( outerRowCount * h ) + term3
         }
 
         // return a map of the cost functions in descending order
-        return mapOf<String, Double>("C1" to c1, "C2" to c2, "C3" to c3, "C4" to c4).toSortedMap(compareByDescending { it })
+        return mapOf<String, Double>("CJ2a(secondary)" to c1, "CJ2b(cluster)" to c2, "CJ2c(primary)" to c3, "CJ2d(hash)" to c4).toSortedMap(compareByDescending { it })
     }
 
 
@@ -68,8 +68,14 @@ fun main(args: Array<String>) {
     // J1 - Nested-loop join --------------
 
 
+
     // J2 - Index-based nested-loop join ONLY APPLICABLE if the INNER TABLE HAS INDEX
-//    val j2 = joinAlgorithms.J2IndexBasedJoinCost()
-//    println("J2 Index-based nested-loop join: \n$j2")
+    // Employee as outer table & Department as inner with Primary Index on deptNo
+    val j2 = joinAlgorithms.J2IndexBasedJoinCost(
+        hasPrimaryIndex = true, bfr = 4, js = (1.0/125.0), outerBlockCount = 2000,
+        outerRowCount = 10000, innerRowCount = 125, innerIndexLevel = 1,
+        innnerSelectioCard = 1.0, hasClusterIndex = false, hasSecondaryIndex = false, hasHashIndex = true
+    )
+    println("J2 Index-based nested-loop join: \n$j2")
 
 }
