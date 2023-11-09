@@ -1,7 +1,5 @@
 package com.test.querycostapp.algorithms
 
-import com.test.querycostapp.model.Employee
-import com.test.querycostapp.repo.EmpMetaRepo
 import kotlin.math.ceil
 import kotlin.math.log2
 
@@ -54,4 +52,33 @@ object searchAlgorithms{
     fun S4IndexForMultipleRecords(indexLevel: Int, blockCount: Int): Double {
         return indexLevel.toDouble() + ((blockCount.toDouble()) / 2)
     }
+}
+
+// Testing the Search Algorithms
+fun main(args: Array<String>) {
+    // S1 - Linear Search ---------------------------
+    // If key (unique) AND equality
+    val Cs1a = searchAlgorithms.S1LinearSearch( notFound = false, unique = true, equality = true, blockCount = 2000)
+    println("S1 Linear Search (key, equality): $Cs1a")
+    //  If key (unique) AND range
+    val Cs1b = searchAlgorithms.S1LinearSearch( notFound = false, unique = true, equality = false, blockCount = 2000)
+    println("S1 Linear Search (key, range): $Cs1b")
+    //  If NON-key (not unique) AND equality
+    val Cs1c = searchAlgorithms.S1LinearSearch( notFound = false, unique = false, equality = true, blockCount = 2000)
+    println("S1 Linear Search (nonkey, equality): $Cs1c")
+    //  If key (not unique) AND range
+    val Cs1d = searchAlgorithms.S1LinearSearch( notFound = false, unique = false, equality = false, blockCount = 2000)
+    println("S1 Linear Search (nonkey, range): $Cs1d")
+    println()
+
+
+    // S2 - Binary Search ------------------------
+
+    // S3 -  hash key to retrieve a single record ---------------------------
+
+    // S4 - Index for Multiple Records ------------------------
+    val Cs4 = searchAlgorithms.S4IndexForMultipleRecords(indexLevel = 3, blockCount = 2000)
+    println("S4 Index for Multiple Records: $Cs4")
+
+
 }

@@ -11,6 +11,8 @@ import com.test.querycostapp.model.ProjectMetadata
 import com.test.querycostapp.model.TablesMetadata
 import java.text.AttributedCharacterIterator.Attribute
 
+// This method searches if the value of the attribute entered exists in the table
+// like if SSN = 123 is in the Employee table, it will return TRUE
 fun valueExists(targetValue : String, targetAttribute: String, table: List<Any>) : Boolean {
     var exists = false
     val targetAttribute = targetAttribute.lowercase()
@@ -51,6 +53,8 @@ fun valueExists(targetValue : String, targetAttribute: String, table: List<Any>)
     return exists
 }
 
+// This method searches if the attribute entered exists in the tables columns
+// like if target Attribute is EmpNo from table Employee, it will return FALSE
 fun attributeExists(targetAttribute: String, table: List<Any>) : Boolean {
     var exists = false
     val targetAttribute = targetAttribute.lowercase()

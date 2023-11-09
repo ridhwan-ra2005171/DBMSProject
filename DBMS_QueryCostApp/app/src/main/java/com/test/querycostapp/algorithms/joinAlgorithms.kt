@@ -1,6 +1,6 @@
 package com.test.querycostapp.algorithms
 
-object joinAlgorithm {
+object joinAlgorithms {
 
     // J1—Nested-loop join
 
@@ -15,7 +15,7 @@ object joinAlgorithm {
 
     // outerBlockCount: if the outer table (R) has index on attribute A, the outerBlockCount is the number of blocks of the index
     // otherwise, its the number of blocks for the entire outer table
-    fun S2IndexBaseJoinCost(js : Double, outerBlockCount : Int, outerRowCount : Int, innerRowCount : Int, innerIndexLevel : Int, innnerSelectioCard: Double, bfr : Int,
+    fun J2IndexBasedJoinCost(js : Double, outerBlockCount : Int, outerRowCount : Int, innerRowCount : Int, innerIndexLevel : Int, innnerSelectioCard: Double, bfr : Int,
                             hasSecondaryIndex : Boolean, hasClusterIndex : Boolean, hasPrimaryIndex : Boolean, hasHashIndex : Boolean,
                             outerHashValue : Double = 0.0, innerHashValue : Double = 0.0) : Map<String, Double> {
 
@@ -61,4 +61,15 @@ object joinAlgorithm {
 
 
     // J4—Partition–hash join (or just hash join)
+}
+
+// Testing join algorithms
+fun main(args: Array<String>) {
+    // J1 - Nested-loop join --------------
+
+
+    // J2 - Index-based nested-loop join ONLY APPLICABLE if the INNER TABLE HAS INDEX
+//    val j2 = joinAlgorithms.J2IndexBasedJoinCost()
+//    println("J2 Index-based nested-loop join: \n$j2")
+
 }
