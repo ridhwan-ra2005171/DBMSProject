@@ -1,5 +1,7 @@
 package com.test.querycostapp.algorithms
 
+import com.test.querycostapp.algorithms.searchAlgorithms.S2BinarySearchCost
+import com.test.querycostapp.algorithms.searchAlgorithms.S6SecondaryIndexCost
 import kotlin.math.ceil
 import kotlin.math.log2
 
@@ -52,6 +54,30 @@ object searchAlgorithms{
     fun S4IndexForMultipleRecords(indexLevel: Int, blockCount: Int): Double {
         return indexLevel.toDouble() + ((blockCount.toDouble()) / 2)
     }
+
+
+    //S6- Using a secondary (B+-tree) index
+    //S6a -> For a secondary index on a key (unique) attribute, with an equality condition, cost is x + 1
+    //for secondary on nonkey attribute, cost is CS6a = x + 1 + s [s is selection cardinality]
+    //S6b -> for range queries The cost estimate for this case, approximately, is CS6b = x + (bI1/2) + (r/2) [bI1 is the number of blocks in the index, r is the number of records in the index]
+
+    fun S6SecondaryIndexCost(x: Double, isUniqueKeyAttribute: Boolean, isRangeQuery: Boolean, s: Double = 0.0, bI1: Int = 0, r: Int = 0): Double {
+        return if (!isRangeQuery) {
+            if (isUniqueKeyAttribute) {
+                // S6a -> For a secondary index on a unique key attribute with an equality condition
+                x + 1.0
+            } else {
+
+                // S6a -> For a secondary index on a non-key attribute with an equality condition
+                x + 1.0 + s
+            }
+        } else { //if its on range queries
+
+            // S6b -> For a secondary index on a unique key attribute with a range query
+            x + (bI1 / 2.0) + (r / 2.0)
+        }
+    }
+
 }
 
 // Testing the Search Algorithms
@@ -73,12 +99,33 @@ fun main(args: Array<String>) {
 
 
     // S2 - Binary Search ------------------------
+    // Number of blocks, selection cardinality, blocking factor
+    val cost1 = S2BinarySearchCost(64, 1.0, 8)  //equality on a unique key attribute
+    println("S2 Cost 1: $cost1")
+    val cost2 = S2BinarySearchCost(64,100.0,8) //equality on a non-unique key attribute
+    println("S2 Cost 2: $cost2")
+    println()
+
 
     // S3 -  hash key to retrieve a single record ---------------------------
 
     // S4 - Index for Multiple Records ------------------------
     val Cs4 = searchAlgorithms.S4IndexForMultipleRecords(indexLevel = 3, blockCount = 2000)
     println("S4 Index for Multiple Records: $Cs4")
+    println()
 
+
+    //S6 - Secondary Index Cost--------------------
+    // Example usage for a secondary index on a unique key attribute with an equality condition
+    val S6cost1 = S6SecondaryIndexCost(5.0, isUniqueKeyAttribute = true, isRangeQuery = false)
+    println("Cost S6a: $cost1")
+
+    // Example usage for a secondary index on a unique key attribute with a range query
+    val S6cost2 = S6SecondaryIndexCost(5.0, isUniqueKeyAttribute = true, isRangeQuery = true, bI1 = 100, r = 500)
+    println("Cost S6b: $S6cost2")
+
+    // Example usage for a secondary index on a non-key attribute with an equality condition
+    val S6cost3 = S6SecondaryIndexCost(5.0, isUniqueKeyAttribute = false, isRangeQuery = false, s = 50.0)
+    println("Cost S6a nonkey: $S6cost3")
 
 }
