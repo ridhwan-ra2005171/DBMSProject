@@ -5,7 +5,6 @@ package com.example.dbmsphase2.view
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -17,7 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.test.querycostapp.model.Employee
-import com.test.querycostapp.repo.EmployeeRepo
+import com.test.querycostapp.repo.dataRepos.EmployeeRepo
 
 @Composable
 fun TableEmployee(employees: List<Employee>) {

@@ -145,14 +145,20 @@ fun main(args: Array<String>) {
 
 }
 
-
+enum class QUERY_TYPE {
+    SELECT,
+    JOIN
+}
 
 object CostEstimatorRepo {
 
+    var queryType = QUERY_TYPE.SELECT // We will use this to determine which costs to call
 
     var writtenQuery = mutableListOf<String>() //will be passed when Done is entered
+
     var employees = mutableListOf<Employee>() //will be passed when Done is entered
     var projects = mutableListOf<Project>() //will be passed when Done is entered
+
     var empMetadatas = mutableListOf<EmployeeMetadata>() //will be passed when Done is entered
     var projectMetadatas = mutableListOf<ProjectMetadata>() //will be passed when Done is entered
     var tableMetadatas = mutableListOf<TablesMetadata>() //will be passed when Done is entered
@@ -214,7 +220,7 @@ object CostEstimatorRepo {
             // join format: JOIN "table1, table2" WHERE "Condition", #buffers
             Log.d("Operator", "handleQuery: Joinoooo")
 
-
+            queryType = QUERY_TYPE.JOIN
         }
     }
 

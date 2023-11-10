@@ -15,14 +15,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
-import com.test.querycostapp.repo.EmployeeRepo
-import com.test.querycostapp.repo.ProjectRepo
+import com.test.querycostapp.repo.dataRepos.EmployeeRepo
+import com.test.querycostapp.repo.dataRepos.ProjectRepo
 import com.test.querycostapp.ui.theme.QueryCostAppTheme
 import com.test.querycostapp.view.navigation.AppNavigator
 import com.test.querycostapp.view.navigation.BottomBar

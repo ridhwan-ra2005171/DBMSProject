@@ -1,4 +1,4 @@
-package com.test.querycostapp.repo
+package com.test.querycostapp.repo.dataRepos
 
 import android.content.Context
 import com.test.querycostapp.model.IndexMetadata

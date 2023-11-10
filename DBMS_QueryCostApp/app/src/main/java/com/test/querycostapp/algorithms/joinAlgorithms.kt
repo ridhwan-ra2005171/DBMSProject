@@ -28,10 +28,11 @@ object joinAlgorithms {
     // outerBlockCount: if the outer table (R) has index on attribute A, the outerBlockCount is the number of blocks of the index
     // otherwise, its the number of blocks for the entire outer table
     fun J2IndexBasedJoinCost(js : Double, bR : Int, R : Int, S : Int, xB : Int,
-                             sB: Double, // selection cardinality for attribute B
+                             sB: Double, // selection cardinality for inner table attribute B
                              bfrRS : Int,
-                             hasSecondaryIndex : Boolean, hasClusterIndex : Boolean, hasPrimaryIndex : Boolean, hasHashIndex : Boolean,
-                             outerHashValue : Double = 0.0, innerHashValue : Double = 0.0) : Map<String, Double> {
+                             hasSecondaryIndex : Boolean, hasClusterIndex : Boolean, hasPrimaryIndex : Boolean,
+                             outerHasHashIndex : Boolean, innerHashIndex : Boolean
+                             ) : Map<String, Double> {
 
         var c1 = 0.0; var c2 =0.0; var c3 =0.0; var c4 = 0.0
 
@@ -60,9 +61,12 @@ object joinAlgorithms {
         // CJ2d = bR + (|R| * h) + ((js * |R| * |S|)/bfrRS)
         // h is the average number of block accesses to retrieve a record, given its hash key value
         val h = 1.2
-        // if there is a hash index AND if the outer table has hash index OR the inner table has hash index
-        if (hasHashIndex || !(outerHashValue == 0.0 && innerHashValue == 0.0)) {
+        // if the innner table has a hash index (innerHashIndex = true) use the above formula
+        if (innerHashIndex && outerHasHashIndex == false) {
             c4 = bR + ( R * h ) + term3
+        } else { // if both tables (inner and outer) have hash index modify the formula to be
+                 // bR + (|R| * h) + (h * |S|) + ((js * |R| * |S|)/bfrRS)
+            c4 = bR + ( R * h ) + (h * S) + term3
         }
 
         // return a map of the cost functions in descending order
@@ -101,7 +105,7 @@ fun J3SortMergeJoinCost(
 
     // J4—Partition–hash join (or just hash join)
     //
-    fun J4PartitionHashJoin(bR: Int, bS: Int, js: Double, R: Int, S: Int, bfrRS: Int): Double{
+    fun J4PartitionHashJoinCost(bR: Int, bS: Int, js: Double, R: Int, S: Int, bfrRS: Int): Double{
         val CJ4 = 3 * (bR + bS) + (js * R * S) / bfrRS.toDouble()
         return CJ4
     }
@@ -119,7 +123,8 @@ fun main(args: Array<String>) {
     val j2 = joinAlgorithms.J2IndexBasedJoinCost(
         hasPrimaryIndex = true, bfrRS = 4, js = (1.0/125.0), bR = 2000,
         R = 10000, S = 125, xB = 1,
-        sB = 1.0, hasClusterIndex = false, hasSecondaryIndex = false, hasHashIndex = true
+        sB = 1.0, hasClusterIndex = false, hasSecondaryIndex = false,
+        innerHashIndex = true, outerHasHashIndex = false
     )
     println("J2 Index-based nested-loop join: \n$j2")
 

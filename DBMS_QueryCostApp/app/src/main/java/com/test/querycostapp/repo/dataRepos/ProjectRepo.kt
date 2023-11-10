@@ -1,7 +1,7 @@
-package com.test.querycostapp.repo
+package com.test.querycostapp.repo.dataRepos
 
 import android.content.Context
-import com.test.querycostapp.repo.ProjectRepo.projects
+import com.test.querycostapp.repo.dataRepos.ProjectRepo.projects
 import com.test.querycostapp.model.Project
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json

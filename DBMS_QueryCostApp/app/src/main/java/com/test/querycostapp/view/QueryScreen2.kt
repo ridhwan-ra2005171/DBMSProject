@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -28,12 +27,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.test.querycostapp.repo.CostEstimatorRepo
 import com.test.querycostapp.repo.CostEstimatorRepo.handleQuery
-import com.test.querycostapp.repo.EmpMetaRepo
-import com.test.querycostapp.repo.EmployeeRepo
-import com.test.querycostapp.repo.IndexMetaRepo
-import com.test.querycostapp.repo.ProjMetaRepo
-import com.test.querycostapp.repo.ProjectRepo
-import com.test.querycostapp.repo.TablesMetaRepo
+import com.test.querycostapp.repo.dataRepos.EmpMetaRepo
+import com.test.querycostapp.repo.dataRepos.EmployeeRepo
+import com.test.querycostapp.repo.dataRepos.IndexMetaRepo
+import com.test.querycostapp.repo.dataRepos.ProjMetaRepo
+import com.test.querycostapp.repo.dataRepos.ProjectRepo
+import com.test.querycostapp.repo.dataRepos.TablesMetaRepo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
