@@ -31,23 +31,23 @@ object JoinCostEstimator {
 
         // The hasSecondaryIndex is used to check if the inner table has a secondary index for the Index-based join (J2)
         // we will assume the inner table is Project, IF NOT, the hasSecondaryIndex will go to the next if statement
-        var hasSecondaryIndex = checkIfIndexExists("Project_projectNo", "Secondary", indexMetadata)
+        var hasSecondaryIndex = checkIfIndexExists("Project_managedBy", "Secondary", indexMetadata)
         // if inner table is Employee, search if a secondary index on attribute SSN exists
         if (innerTable.tableName.equals("Employee", ignoreCase = true)) {
             hasSecondaryIndex = checkIfIndexExists("Employee_SSN", "Secondary", indexMetadata)
         }
 
-        var hasClusterIndex = checkIfIndexExists("Project_projectNo", "Cluster", indexMetadata)
+        var hasClusterIndex = checkIfIndexExists("Project_managedBy", "Cluster", indexMetadata)
         if (innerTable.tableName.equals("Employee", ignoreCase = true)) {
             hasClusterIndex = checkIfIndexExists("Employee_SSN", "Cluster", indexMetadata)
         }
 
-        var hasPrimaryIndex = checkIfIndexExists("Project_projectNo", "Primary", indexMetadata)
+        var hasPrimaryIndex = checkIfIndexExists("Project_managedBy", "Primary", indexMetadata)
         if (innerTable.tableName.equals("Employee", ignoreCase = true)) {
             hasPrimaryIndex = checkIfIndexExists("Employee_SSN", "Primary", indexMetadata)
         }
 
-        var hasHashIndex = checkIfIndexExists("Project_projectNo", "Hash", indexMetadata)
+        var hasHashIndex = checkIfIndexExists("Project_managedBy", "Hash", indexMetadata)
         if (innerTable.tableName.equals("Employee", ignoreCase = true)) {
             hasHashIndex = checkIfIndexExists("Employee_SSN", "Hash", indexMetadata)
         }
@@ -71,7 +71,7 @@ object JoinCostEstimator {
 
         // The costs of each join, stored in a list
         val cost_list = mutableMapOf<String, Double>("CJ1" to CJ1, "CJ2a" to CJ2a, "CJ2b" to CJ2b, "CJ2c" to CJ2c, "CJ2d" to CJ2d, "CJ3" to CJ3, "CJ4" to CJ4)
-        return cost_list.filter {it.value > 0}.toSortedMap()
+        return cost_list.filter {it.value > 0}.toList().sortedBy { (_, value) -> value}.toMap()
     }
 
 
