@@ -1,4 +1,4 @@
-//package com.example.dbmsphase2.view
+package com.test.querycostapp.view.unusedViews//package com.example.dbmsphase2.view
 //
 //import androidx.compose.foundation.layout.*
 //import androidx.compose.foundation.lazy.LazyColumn

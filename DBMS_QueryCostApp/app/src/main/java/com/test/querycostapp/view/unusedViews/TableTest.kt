@@ -1,4 +1,4 @@
-package com.example.dbmsphase2.view
+package com.test.querycostapp.view.unusedViews
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
