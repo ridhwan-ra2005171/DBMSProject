@@ -274,8 +274,9 @@ object CostEstimatorRepo {
             //initializing number of Buffers (for J1 algorithm)
             var noOfBuffers = writtenQuery[3].toInt()
 
-            JoinCostEstimator.getJoinCost(outerTable,innerTable, empMetadatas, projectMetadatas,
+            var Costs = JoinCostEstimator.getJoinCost(outerTable,innerTable, empMetadatas, projectMetadatas,
                 indexMetadatas,noOfBuffers)
+            Log.d("Join Costs", "Costs: ${Costs.entries}")
 
             queryType = QUERY_TYPE.JOIN
         }
