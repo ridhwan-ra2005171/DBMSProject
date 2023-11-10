@@ -13,7 +13,8 @@ object JoinCostEstimator {
                     innerTable : TableClass,
                     empMetadata : MutableList<EmployeeMetadata>,
                     projectMetadata: MutableList<ProjectMetadata>,
-                    indexMetadata : MutableList<IndexMetadata>) : Map<String, Double> {
+                    indexMetadata : MutableList<IndexMetadata>,
+                    noOfBuffers : Int) : Map<String, Double> {
         val js = 1.0 / Math.max(
             empMetadata.find { it.EmpAttribute.equals("SSN", ignoreCase = true) }?.NDV!!,
             projectMetadata.find { it.ProjAttribute.equals("ManagedBy", ignoreCase = true) }?.NDV!!
@@ -24,7 +25,7 @@ object JoinCostEstimator {
         val R = innerTable.rowCount
         val S = outerTable.rowCount
         val bfrRS = outerTable.bfr
-        val nB = outerTable.blockCount
+        val nB = noOfBuffers
 
         val sB = empMetadata.find { it.EmpAttribute.equals("SSN", ignoreCase = true) }?.selectionCardinality!!
 
