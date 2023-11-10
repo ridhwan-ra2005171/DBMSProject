@@ -31,7 +31,7 @@ object joinAlgorithms {
                              sB: Double, // selection cardinality for inner table attribute B
                              bfrRS : Int,
                              hasSecondaryIndex : Boolean, hasClusterIndex : Boolean, hasPrimaryIndex : Boolean,
-                             outerHasHashIndex : Boolean, innerHashIndex : Boolean
+                             innerHashIndex : Boolean, outerHasHashIndex : Boolean,
                              ) : Map<String, Double> {
 
         var c1 = 0.0; var c2 =0.0; var c3 =0.0; var c4 = 0.0
@@ -70,7 +70,8 @@ object joinAlgorithms {
         }
 
         // return a map of the cost functions in descending order
-        return mapOf<String, Double>("CJ2a(secondary)" to c1, "CJ2b(cluster)" to c2, "CJ2c(primary)" to c3, "CJ2d(hash)" to c4).toSortedMap(compareByDescending { it })
+        return mapOf<String, Double>("CJ2a(secondary)" to c1, "CJ2b(cluster)" to c2, "CJ2c(primary)" to c3, "CJ2d(hash)" to c4)
+//            .toSortedMap(compareByDescending { it })
     }
 
 

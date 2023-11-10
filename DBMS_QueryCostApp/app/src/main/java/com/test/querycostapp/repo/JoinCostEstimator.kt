@@ -51,21 +51,26 @@ object JoinCostEstimator {
             hasHashIndex = checkIfIndexExists("Employee_SSN", "Hash", indexMetadata)
         }
 
-        var costList = mapOf<String, Double>()
-
         // J1 - Nested-loop join --------------
-        joinAlgorithms.J1NestedLoopJoinCost( bR, bS, js, R, S, bfrRS, nB)
+        val CJ1 = joinAlgorithms.J1NestedLoopJoinCost( bR, bS, js, R, S, bfrRS, nB)
 
         // J2 - Index Based join
-        joinAlgorithms.J2IndexBasedJoinCost(js, bR, R, S, nB, sB, bfrRS, hasSecondaryIndex, hasClusterIndex, hasPrimaryIndex, outerHasHashIndex = false, innerHashIndex = true )
+        val CJ2 = joinAlgorithms.J2IndexBasedJoinCost(
+            js, bR, R, S, nB, sB, bfrRS,
+            hasSecondaryIndex, hasClusterIndex, hasPrimaryIndex,
+            innerHashIndex = true, outerHasHashIndex = false )
+        // Storing the cost of each join in an object each (deconstructing the CJ2 list)
+        val (CJ2a, CJ2b, CJ2c, CJ2d) = CJ2.values.toList()
 
         // J3 - Sort-merge join
-        joinAlgorithms.J3SortMergeJoinCost(bR, bS, js, R, S, bfrRS, false)
+        val CJ3 = joinAlgorithms.J3SortMergeJoinCost(bR, bS, js, R, S, bfrRS, false)
 
         // J4 - Partition-hash join
-        joinAlgorithms.J4PartitionHashJoinCost(bR, bS, js, R, S, bfrRS)
+        val CJ4 = joinAlgorithms.J4PartitionHashJoinCost(bR, bS, js, R, S, bfrRS)
 
-        return costList
+        // The costs of each join, stored in a list
+        val cost_list = mutableMapOf<String, Double>("CJ1" to CJ1, "CJ2a" to CJ2a, "CJ2b" to CJ2b, "CJ2c" to CJ2c, "CJ2d" to CJ2d, "CJ3" to CJ3, "CJ4" to CJ4)
+        return cost_list.filter {it.value > 0}.toSortedMap()
     }
 
 

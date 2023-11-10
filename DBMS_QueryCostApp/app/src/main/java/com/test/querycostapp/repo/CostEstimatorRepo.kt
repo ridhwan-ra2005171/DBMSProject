@@ -219,11 +219,13 @@ object CostEstimatorRepo {
         } else if (writtenQuery[0].equals("JOIN", ignoreCase = true)) {
             // join format: JOIN "table1, table2" WHERE "Condition", #buffers
             Log.d("Operator", "handleQuery: Joinoooo")
-
             queryType = QUERY_TYPE.JOIN
         }
     }
 
+//    fun getJoinCost() : Map<String, Double> {
+//        JoinCostEstimator.getJoinCost()
+//    }
 
     //primary key = SSN
 //    primary key and equality operator,
