@@ -8,6 +8,7 @@ import com.test.querycostapp.model.IndexMetadata
 import com.test.querycostapp.model.Project
 import com.test.querycostapp.model.ProjectMetadata
 import com.test.querycostapp.model.TablesMetadata
+import com.test.querycostapp.model.tableTypesClasses.TableClass
 
 // This method searches if the value of the attribute entered exists in the table
 // like if SSN = 123 is in the Employee table, it will return TRUE
@@ -217,8 +218,31 @@ object CostEstimatorRepo {
 
             //OPERATOR JOIN
         } else if (writtenQuery[0].equals("JOIN", ignoreCase = true)) {
-            // join format: JOIN "table1, table2, #buffers"
+            // join format: JOIN "table1 table2 #buffers"
             Log.d("Operator", "handleQuery: Joinoooo")
+
+            var outerTable = TableClass()
+            var innerTable = TableClass()
+            //initializing the outer table
+            if (writtenQuery[1].equals("Employee", ignoreCase = true)){
+                outerTable = TableClass(writtenQuery[1], empBfr, empBlk, empRowCount)
+            } else if (writtenQuery[1].equals("Project", ignoreCase = true)){
+                outerTable = TableClass(writtenQuery[1], projBfr, projBlk, projRowCount)
+            }
+
+            //initializing the inner table
+            if (writtenQuery[2].equals("Employee", ignoreCase = true)){
+                innerTable = TableClass(writtenQuery[2], empBfr, empBlk, empRowCount)
+            } else if (writtenQuery[2].equals("Project", ignoreCase = true)){
+                innerTable = TableClass(writtenQuery[2], projBfr, projBlk, projRowCount)
+            }
+
+            //initializing number of Buffers (for J1 algorithm)
+            var noOfBuffers = writtenQuery[3].toInt()
+
+            JoinCostEstimator.getJoinCost(outerTable,innerTable, empMetadatas, projectMetadatas,
+                indexMetadatas,noOfBuffers)
+
             queryType = QUERY_TYPE.JOIN
         }
     }
