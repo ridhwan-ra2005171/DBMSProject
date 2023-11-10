@@ -166,42 +166,54 @@ object CostEstimatorRepo {
     var indexMetadatas = mutableListOf<IndexMetadata>() //will be passed when Done is entered
 
     // From table metadata ------------------------------------------------------------------------------------
-    var empBfr = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.bfr
-    var projBfr = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.bfr
+    //var empBfr = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.bfr
+    //var projBfr = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.bfr
 
-    var empBlk = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.blockCount
-    var projBlk = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.blockCount
+    //var empBlk = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.blockCount
+    //var projBlk = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.blockCount
 
-    var empRowCount = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.rowCount
-    var projRowCount = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.rowCount
+    //var empRowCount = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.rowCount
+    //var projRowCount = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.rowCount
 
 
     fun handleQuery() {
+
+        // From table metadata ------------------------------------------------------------------------------------
+        var empBfr = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.bfr
+        var projBfr = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.bfr
+
+        var empBlk = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.blockCount
+        var projBlk = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.blockCount
+
+        var empRowCount = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.rowCount
+        var projRowCount = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.rowCount
+
 //        Log.d("Operator", "handleQuery: ${writtenQuery[0]}")
-        Log.d("employees", "${employees} ")
+//        Log.d("employees", "${employees} ")
 //        Log.d("projects", "${projects} ")
 
-        if (writtenQuery.size > 1) { //dont delete this if statement, or else we get error index
+//        if (writtenQuery.size > 1) { //dont delete this if statement, or else we get error index
+//
+//
+//            Log.d("query", "${writtenQuery[7]} ")
+//            Log.d("query", "${employees[0].SSN} ")
+//
+//            //just testing via hardcoding (press the button) [binary search working]
+//            Log.d("S2", "${writtenQuery[7]}")
+//            val (index) = binarySearchEmployee(
+//                employees,
+//                writtenQuery[7]
+//            ) //SELECT * FROM Employee WHERE SSN = 2345
+//            if (index != -1) { //if employee is found
+//                val employee = employees[index]
+//                Log.d("S2", "${employee}")
+//            } else {
+//                Log.d("S2", "Employee with SSN ${writtenQuery[7]} not found")
+//            }
+//        }
 
-
-            Log.d("query", "${writtenQuery[7]} ")
-            Log.d("query", "${employees[0].SSN} ")
-
-            //just testing via hardcoding (press the button) [binary search working]
-            Log.d("S2", "${writtenQuery[7]}")
-            val (index) = binarySearchEmployee(
-                employees,
-                writtenQuery[7]
-            ) //SELECT * FROM Employee WHERE SSN = 2345
-            if (index != -1) { //if employee is found
-                val employee = employees[index]
-                Log.d("S2", "${employee}")
-            } else {
-                Log.d("S2", "Employee with SSN ${writtenQuery[7]} not found")
-            }
-        }
-
-
+        Log.d("metadata", "tableMetaDatas: ${tableMetadatas[0]} + ${tableMetadatas[1]}")
+        Log.d("empMetadata", "empBfr, empBlk, empRow: ${empBfr} + ${empBlk} + ${empRowCount}")
         //OPERATOR SELECT
         if (writtenQuery[0].equals("SELECT", ignoreCase = true)) {
             Log.d("Operator", "handleQuery: Selectooooo")
@@ -225,16 +237,38 @@ object CostEstimatorRepo {
             var innerTable = TableClass()
             //initializing the outer table
             if (writtenQuery[1].equals("Employee", ignoreCase = true)){
-                outerTable = TableClass(writtenQuery[1], empBfr, empBlk, empRowCount)
+                //outerTable = TableClass(writtenQuery[1], empBfr, empBlk, empRowCount)
+                outerTable.tableName = writtenQuery[1]
+                outerTable.bfr = empBfr
+                outerTable.blockCount = empBlk
+                outerTable.rowCount = empRowCount
+                Log.d("outerT", "outertable: ${outerTable.tableName} + ${outerTable.bfr} + ${outerTable.blockCount} + ${outerTable.rowCount}")
+                println(outerTable)
             } else if (writtenQuery[1].equals("Project", ignoreCase = true)){
-                outerTable = TableClass(writtenQuery[1], projBfr, projBlk, projRowCount)
+                //outerTable = TableClass(writtenQuery[1], projBfr, projBlk, projRowCount)
+                outerTable.tableName = writtenQuery[1]
+                outerTable.bfr = projBfr
+                outerTable.blockCount = projBlk
+                outerTable.rowCount = projRowCount
+                Log.d("outerT", "outertable: ${outerTable.tableName} + ${outerTable.bfr} + ${outerTable.blockCount} + ${outerTable.rowCount}")
+                println(outerTable)
             }
 
             //initializing the inner table
             if (writtenQuery[2].equals("Employee", ignoreCase = true)){
-                innerTable = TableClass(writtenQuery[2], empBfr, empBlk, empRowCount)
+                //innerTable = TableClass(writtenQuery[2], empBfr, empBlk, empRowCount)
+                innerTable.tableName = writtenQuery[2]
+                innerTable.bfr = empBfr
+                innerTable.blockCount = empBlk
+                innerTable.rowCount = empRowCount
+                Log.d("innerT", "innerT: ${innerTable.tableName} + ${innerTable.bfr} + ${innerTable.blockCount} + ${innerTable.rowCount}")
             } else if (writtenQuery[2].equals("Project", ignoreCase = true)){
-                innerTable = TableClass(writtenQuery[2], projBfr, projBlk, projRowCount)
+                //innerTable = TableClass(writtenQuery[2], projBfr, projBlk, projRowCount)
+                innerTable.tableName = writtenQuery[2]
+                innerTable.bfr = projBfr
+                innerTable.blockCount = projBlk
+                innerTable.rowCount = projRowCount
+                Log.d("innerT", "innerT: ${innerTable.tableName} + ${innerTable.bfr} + ${innerTable.blockCount} + ${innerTable.rowCount}")
             }
 
             //initializing number of Buffers (for J1 algorithm)

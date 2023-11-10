@@ -1,3 +1,3 @@
 package com.test.querycostapp.model.tableTypesClasses
 
-open class TableClass( val tableName: String ="", val bfr: Int? = -1, val blockCount: Int? = -1, val rowCount: Int? = -1)
+open class TableClass(var tableName: String ="", var bfr: Int? = -1, var blockCount: Int? = -1, var rowCount: Int? = -1)
