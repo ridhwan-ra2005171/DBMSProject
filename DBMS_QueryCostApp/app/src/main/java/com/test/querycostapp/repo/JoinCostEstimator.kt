@@ -64,7 +64,7 @@ object JoinCostEstimator {
         val (CJ2a, CJ2b, CJ2c, CJ2d) = CJ2.values.toList()
 
         // J3 - Sort-merge join
-        val CJ3 = joinAlgorithms.J3SortMergeJoinCost(bR, bS, js, R, S, bfrRS, false)
+        val CJ3 = joinAlgorithms.J3SortMergeJoinCost(bR, bS, js, R, S, bfrRS, false) //figure out sorting needed
 
         // J4 - Partition-hash join
         val CJ4 = joinAlgorithms.J4PartitionHashJoinCost(bR, bS, js, R, S, bfrRS)
