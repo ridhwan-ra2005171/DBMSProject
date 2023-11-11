@@ -5,6 +5,7 @@ package com.test.querycostapp.view
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -23,12 +25,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -51,7 +56,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import com.test.querycostapp.repo.CostEstimatorRepo
 import com.test.querycostapp.repo.JoinCostEstimator
-import com.test.querycostapp.view.unusedViews.DDMenu
 
 @Preview
 @Composable
@@ -65,7 +69,17 @@ fun JoinScreen() {
 
     var outerTable by rememberSaveable { mutableStateOf("")}
     var innerTable by rememberSaveable { mutableStateOf("")}
+
+    var outerTableAttr by rememberSaveable { mutableStateOf("")}
+    var innerTableAttr by rememberSaveable { mutableStateOf("")}
+
     var bufferNo by rememberSaveable { mutableStateOf(3)}
+
+    var employeeHasHash by rememberSaveable { mutableStateOf(false)}
+    var projectHasHash by rememberSaveable { mutableStateOf(false)}
+
+    var resetClicked by rememberSaveable { mutableStateOf(false)}
+
     var costList by rememberSaveable {
         mutableStateOf(mapOf( "Example 1" to 0.0, "Example 2" to 0.0, "Example 3" to 0.0))
     }
@@ -89,36 +103,112 @@ fun JoinScreen() {
         // Table chooser
         TableChooser(
             tablesList = tableList,
+            resetClicked = resetClicked,
             selectedItem = mutableStateOf(outerTable),
-            onItemSelected = { item1, item2 -> outerTable = item1; innerTable = item2 },
+            onItemSelected = {
+                    outer, inner -> outerTable = outer; innerTable = inner;
+                    resetClicked = false
+                        // If the outer table is selected AND the outer table is Employee, make the outer tabel attribute = SSN, else ManagedBy
+                        if (!outerTable.isEmpty() && outerTable.equals("Employee", ignoreCase = true)){
+                            outerTableAttr = "SSN"; innerTableAttr = "ManagedBy"
+                        } else if (!outerTable.isEmpty() && outerTable.equals("Project", ignoreCase = true)){
+                            outerTableAttr = "ManagedBy"; innerTableAttr = "SSN"
+                        }
+                             },
             onBufferNoChanged = {bufferNo = it})
 
-        Divider(color = MaterialTheme.colorScheme.primaryContainer, thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 15.dp))
 
-        // Button to calculate the cost
-        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-            // Calculate cost button
-            Button(
-                onClick = {
-                    if (outerTable.isEmpty()) {
-                        // Display you need to choose a table
-                        Toast.makeText(context, "You need to choose a table", Toast.LENGTH_SHORT)
-                            .show()
-                    } else {
-                        // Here we call the Join Cost Estimator
+
+        // Show the join function under the "Calculate Cost" button
+        AnimatedVisibility (!outerTable.isEmpty()) {
+            Column {
+                Divider(color = MaterialTheme.colorScheme.primaryContainer, thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 15.dp))
+
+                Text(text = buildAnnotatedString {
+                    withStyle(style = SpanStyle()) {
+                        append("$outerTable ⨝ ")
+                    }
+                    withStyle( style = SpanStyle(fontWeight = FontWeight.SemiBold, fontSize = MaterialTheme.typography.bodySmall.fontSize)) {
+                        append("$outerTableAttr = $innerTableAttr")
+                    }
+                    withStyle(style = SpanStyle()) {
+                        append(" $innerTable")
+                    }
+                },
+                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.bodyLarge.fontSize),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp), textAlign = TextAlign.Center
+                )
+                Divider(color = MaterialTheme.colorScheme.primaryContainer, thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 15.dp))
+
+                //  checkbox to assume that the table has hash key on their respective attributes
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(checked = employeeHasHash, onCheckedChange = { employeeHasHash = it } )
+                        Text(
+                            text = "Assume Hash on Employee for attribute SSN",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(start = 0.dp)
+                        )
+                    }
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(checked = projectHasHash, onCheckedChange =  { projectHasHash = it} )
+                        Text(
+                            text = "Assume Hash on Project for attribute ManagedBy",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(start = 0.dp)
+                        )
+                    }
+                }
+
+                // Button to calculate the cost
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth().padding(10.dp)) {
+                    // Calculate cost button
+                    Button(modifier = Modifier,
+                        onClick = {
+                            if (outerTable.isEmpty()) {
+                                // Display you need to choose a table
+                                Toast.makeText(context, "You need to choose a table", Toast.LENGTH_SHORT)
+                                    .show()
+                            } else {
+                                // Here we call the Join Cost Estimator
 //                    JoinCostEstimator.getJoinCost(noOfBuffers = bufferSize.toInt())
-                        showCosts = true
+                                showCosts = true
+                            }
+
+
+                        }) {
+                        Text(text = "Calculate Cost")
+                    }
+                    // Reset form button
+                    Button(modifier = Modifier,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        ),
+                        onClick = {
+                            // Reset the states
+                            outerTable = ""
+                            innerTable = ""
+                            bufferNo = 3
+                            showCosts = false
+                            employeeHasHash = false
+                            projectHasHash = false
+                            resetClicked = true
+                        }) {
+                        Text(text = "Reset")
                     }
 
 
-                }) {
-                Text(text = "Calculate Cost")
+                }
+
+
+
             }
         }
 
-        if (!outerTable.isEmpty()) {
-            Text(text = "$outerTable ⨝ $innerTable", fontWeight = FontWeight.ExtraBold, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center )
-        }
 
         if (showCosts) {
             // List of costs here
@@ -152,7 +242,7 @@ fun JoinScreen() {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TableChooser(tablesList : List<String>, selectedItem : MutableState<String>, onItemSelected : (String, String) -> Unit, onBufferNoChanged : (Int) -> Unit) {
+fun TableChooser(tablesList : List<String>, resetClicked : Boolean, selectedItem : MutableState<String>, onItemSelected : (String, String) -> Unit, onBufferNoChanged : (Int) -> Unit) {
 
     val buffersList = listOf("3","4","5","6","7","8","9","10")
     val weight = 1f
@@ -163,6 +253,11 @@ fun TableChooser(tablesList : List<String>, selectedItem : MutableState<String>,
 
     var bufferSize by rememberSaveable { mutableStateOf("3")}
 
+    if (resetClicked) {
+        outerTable = ""
+        innerTable = ""
+        bufferSize = "3"
+    }
     Row (
         modifier = Modifier
             .fillMaxWidth()
@@ -176,10 +271,13 @@ fun TableChooser(tablesList : List<String>, selectedItem : MutableState<String>,
             onItemSelected = {
                 outerTable = it
                 // get the opposite item in the table list to be the inner table
-                innerTable = tablesList.get(tablesList.size - tablesList.indexOf(selectedItem.value) -1)
+//                if (resetClicked) {
+                    innerTable = tablesList.get(tablesList.size - tablesList.indexOf(selectedItem.value) -1)
+//                } else { innerTable = "" }
                 onItemSelected(outerTable, innerTable)
         })
 
+        // Join symbol (⨝)
         Text(text = "⨝", modifier = Modifier.padding(top = 13.dp), style = androidx.compose.ui.text.TextStyle( fontSize = MaterialTheme.typography.titleLarge.fontSize,fontWeight = FontWeight.ExtraBold))
 
         // Inner Table (S)
@@ -189,6 +287,7 @@ fun TableChooser(tablesList : List<String>, selectedItem : MutableState<String>,
             Text("Inner Table", style = androidx.compose.ui.text.TextStyle(fontWeight = FontWeight.SemiBold))
             Text(
                 text = innerTable,
+//                text = if (!resetClicked) innerTable else "",
                 color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier
                     .border(
@@ -289,6 +388,29 @@ fun CustomDropDown(
 }
 
 @Composable
+fun CustomCheckBox() {
+    Column {
+        Row {
+            Checkbox(checked = false, onCheckedChange = {} )
+            Text(
+                text = "Assume Hash on Outer Table",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(start = 16.dp)
+            )
+        }
+
+        Row {
+            Checkbox(checked = false, onCheckedChange = {} )
+            Text(
+                text = "Assume Hash on Inner Table",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(start = 16.dp)
+            )
+        }
+    }
+}
+
+@Composable
 fun CostItem(key : String, value : String) {
     Row (modifier = Modifier
         .fillMaxWidth()
@@ -302,3 +424,4 @@ fun CostItem(key : String, value : String) {
 
     }
 }
+
