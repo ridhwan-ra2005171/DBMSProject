@@ -1,0 +1,26 @@
+        //we alr assume that the query will be selection
+
+Employee table:
+        //Primary Key and Equality Operator:
+//        SELECT * FROM Employee WHERE SSN = '1234';
+        // Range Operator:
+//        SELECT * FROM Employee WHERE HireDate >= 'start_date' AND HireDate <= 'end_date';
+        //Non-Primary Key using Equality Operator:
+//        SELECT * FROM Employee WHERE Fname = 'Mohammed';
+        //Non-Primary Key using Range Operator:
+//        SELECT * FROM Employee WHERE HireDate >= 'start_date' AND HireDate <= 'end_date';
+
+Project Table:
+        //Primary Key and Equality Operator:
+SELECT * FROM PROJECT WHERE ProjectNo = 2;
+
+        // Range Operator:
+SELECT * FROM PROJECT WHERE ProjectNo BETWEEN 2 AND 4;
+
+        //Non-Primary Key using Equality Operator:
+SELECT * FROM PROJECT WHERE ProjectName = 'Project B';
+
+        //Non-Primary Key using Range Operator:
+SELECT * FROM PROJECT WHERE ManagedBy BETWEEN 'Manager 1' AND 'Manager 2';
+
+

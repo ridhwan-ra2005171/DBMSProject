@@ -183,34 +183,50 @@ object CostEstimatorRepo {
 //        Log.d("employees", "${employees} ")
 //        Log.d("projects", "${projects} ")
 
+        // Find the index of "FROM" keyword
+        var fromIndex = writtenQuery.indexOf("FROM")
         //SELECT * FROM Employee WHERE SSN = 2345
         if (writtenQuery.size > 1) { //dont delete this if statement, or else we get error index
             Log.d("query[7]", "${writtenQuery[7]} ")
 
-        }
-
-        Log.d("metadata", "tableMetaDatas: ${tableMetadatas[0]} + ${tableMetadatas[1]}")
-        //OPERATOR SELECT
-        if (writtenQuery[0].equals("SELECT", ignoreCase = true)) {
-            Log.d("Operator", "handleQuery: Selectooooo")
-
-            //TABLE EMPLOYEE
-            if (writtenQuery[3].equals("EMPLOYEE", ignoreCase = true)) {
+            var tableName = writtenQuery[fromIndex + 1] //gets table name
 
 
-                //TABLE PROJECT
-            } else if (writtenQuery[3].equals("PROJECT", ignoreCase = true)) {
+            if(tableName.equals("Employee", ignoreCase = true)){ //handles employee table
+                Log.d("tablename", "Table Name: $tableName")
+
+            }else if(tableName.equals("Project", ignoreCase = true)){ //handles project table
+                Log.d("tablename", "Table Name: $tableName")
 
             }
 
-
-            //OPERATOR JOIN
-        } else if (writtenQuery[0].equals("JOIN", ignoreCase = true)) {
-            // join format: JOIN "table1 table2 #buffers"
-            Log.d("Operator", "handleQuery: Joinoooo")
-
-
         }
+
+        Log.d("metadata", "tableMetaDatas: ${tableMetadatas[0]} + ${tableMetadatas[1]}")
+
+
+
+
+//        if (writtenQuery[0].equals("SELECT", ignoreCase = true)) {
+//            Log.d("Operator", "handleQuery: Selectooooo")
+//
+//            //TABLE EMPLOYEE
+//            if (writtenQuery[3].equals("EMPLOYEE", ignoreCase = true)) {
+//
+//
+//                //TABLE PROJECT
+//            } else if (writtenQuery[3].equals("PROJECT", ignoreCase = true)) {
+//
+//            }
+//
+//
+//            //OPERATOR JOIN
+//        } else if (writtenQuery[0].equals("JOIN", ignoreCase = true)) {
+//            // join format: JOIN "table1 table2 #buffers"
+//            Log.d("Operator", "handleQuery: Joinoooo")
+//
+//
+//        }
     }
 
 
