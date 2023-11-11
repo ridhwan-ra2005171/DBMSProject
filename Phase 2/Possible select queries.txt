@@ -14,7 +14,7 @@ Project Table:
         //Primary Key and Equality Operator:
 SELECT * FROM PROJECT WHERE ProjectNo = 2;
 
-        // Range Operator:
+        //Using primary Range Operator:
 SELECT * FROM PROJECT WHERE ProjectNo BETWEEN 2 AND 4;
 
         //Non-Primary Key using Equality Operator:

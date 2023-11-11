@@ -236,7 +236,7 @@ object CostEstimatorRepo {
 
 
                 } else if (writtenQuery.contains(">=") || writtenQuery.contains("<=")|| writtenQuery.contains("<")|| writtenQuery.contains(">")) {
-                    // Range Operator
+                    // Range Operator using primary
                     Log.d("queryType", "Range Operator")
                 } else if (!writtenQuery.contains("SSN") && writtenQuery.contains("=")) { //if doesnt contain primary (meaning uses non-primary key)
                     // Non-Primary Key using Equality Operator
@@ -269,23 +269,74 @@ object CostEstimatorRepo {
                 }
 
 
-            }else if(tableName.equals("Project", ignoreCase = true)){ //handles project table
+            }else if(tableName.equals("PROJECT", ignoreCase = true)){ //handles project table
                 Log.d("tablename", "Table Name: $tableName")
+
+                var blockCount = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.blockCount
+                var rowCount = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.rowCount
+                var empBfr = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.bfr
+                var x = indexMetadatas.firstOrNull { it.indexName.equals("ProjectNo", ignoreCase = true) }?.level //returns level of index
 
 
                 // Check query type for Project table
                 if (writtenQuery.contains("ProjectNo") && writtenQuery.contains("=")) {
+
+
                     // Primary Key and Equality Operator
-                    Log.d("queryType", "Primary Key and Equality Operator")
+                    Log.d("queryType2", "Primary Key and Equality Operator")
+                    var primaryKey = writtenQuery[writtenQuery.indexOf("ProjectNo")] //position of primary key
+//                    var primaryKeyValue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
+                    var targetvalue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
+
+                    Log.d("primarykey2", "primaryKey ${primaryKey} ")
+                    Log.d("primarykey2", "blockCount ${blockCount} ")
+
+//                    Log.d("primarykey", "primaryKeyValue ${primaryKeyValue} ")
+//                    S1a-----
+                    var isFound = valueExists(targetvalue, "ProjectNo", projects)
+                    Log.d("primarykey2", "isFound ${isFound} ")
+
+                    var costS1a = S1LinearSearch(notFound = isFound, unique = true, equality = true, blockCount = blockCount!!)
+//                    S2a------
+                    var costS2a = S2BinarySearchCost(blockCount!!,1.0,empBfr!!) //S=1 since its unique [WORKING]
+
+                    //S3a------
+                    var cost3a = S3aPrimaryKeySelectCost(x!!) //passes index level
+//                    S3b------
+                    var cost3b = S3bHashKeySelectCost() //[Working]
+//                    S6a------
+//                    var costS6a = S6SecondaryIndexCost(rowCount!!,1.0,empBfr!!)
+
+                    Log.d("PKequality2", "costS1a:  ${costS1a} ")
+                    Log.d("PKequality2", "costS2a:  ${costS2a} ")
+                    Log.d("PKequality2", "cost3a:  ${cost3a} ")
+                    Log.d("PKequality2", "cost3b:  ${cost3b} ")
+
+
+
+
+
                 } else if (writtenQuery.contains("ProjectNo") && writtenQuery.contains("BETWEEN")) {
                     // Range Operator
                     Log.d("queryType", "Range Operator")
+
+
+
+
                 } else if (writtenQuery.contains("ProjectName") && writtenQuery.contains("=")) {
                     // Non-Primary Key using Equality Operator
                     Log.d("queryType", "Non-Primary Key using Equality Operator")
+
+
+
+
                 } else if (writtenQuery.contains("ManagedBy") && writtenQuery.contains("BETWEEN")) {
                     // Non-Primary Key using Range Operator
                     Log.d("queryType", "Non-Primary Key using Range Operator")
+
+
+
+
                 }
             }
 
