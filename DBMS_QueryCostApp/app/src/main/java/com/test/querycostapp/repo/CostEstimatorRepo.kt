@@ -192,25 +192,11 @@ object CostEstimatorRepo {
 //        Log.d("employees", "${employees} ")
 //        Log.d("projects", "${projects} ")
 
-//        if (writtenQuery.size > 1) { //dont delete this if statement, or else we get error index
-//
-//
-//            Log.d("query", "${writtenQuery[7]} ")
-//            Log.d("query", "${employees[0].SSN} ")
-//
-//            //just testing via hardcoding (press the button) [binary search working]
-//            Log.d("S2", "${writtenQuery[7]}")
-//            val (index) = binarySearchEmployee(
-//                employees,
-//                writtenQuery[7]
-//            ) //SELECT * FROM Employee WHERE SSN = 2345
-//            if (index != -1) { //if employee is found
-//                val employee = employees[index]
-//                Log.d("S2", "${employee}")
-//            } else {
-//                Log.d("S2", "Employee with SSN ${writtenQuery[7]} not found")
-//            }
-//        }
+        //SELECT * FROM Employee WHERE SSN = 2345
+        if (writtenQuery.size > 1) { //dont delete this if statement, or else we get error index
+            Log.d("query[7]", "${writtenQuery[7]} ")
+
+        }
 
         Log.d("metadata", "tableMetaDatas: ${tableMetadatas[0]} + ${tableMetadatas[1]}")
         Log.d("empMetadata", "empBfr, empBlk, empRow: ${empBfr} + ${empBlk} + ${empRowCount}")
@@ -330,3 +316,22 @@ object CostEstimatorRepo {
 //    Br + Bs +((joinselectivity * |R| * |S|)/bfr of RS
 
 }
+
+
+//
+//
+//            Log.d("query", "${writtenQuery[7]} ")
+//            Log.d("query", "${employees[0].SSN} ")
+//
+//            //just testing via hardcoding (press the button) [binary search working]
+//            Log.d("S2", "${writtenQuery[7]}")
+//            val (index) = binarySearchEmployee(
+//                employees,
+//                writtenQuery[7]
+//            )
+//            if (index != -1) { //if employee is found
+//                val employee = employees[index]
+//                Log.d("S2", "${employee}")
+//            } else {
+//                Log.d("S2", "Employee with SSN ${writtenQuery[7]} not found")
+//            }
