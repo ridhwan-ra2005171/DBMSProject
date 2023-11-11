@@ -178,15 +178,6 @@ object CostEstimatorRepo {
 
     fun handleQuery() {
 
-        // From table metadata ------------------------------------------------------------------------------------
-        var empBfr = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.bfr
-        var projBfr = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.bfr
-
-        var empBlk = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.blockCount
-        var projBlk = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.blockCount
-
-        var empRowCount = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.rowCount
-        var projRowCount = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.rowCount
 
 //        Log.d("Operator", "handleQuery: ${writtenQuery[0]}")
 //        Log.d("employees", "${employees} ")
@@ -199,7 +190,6 @@ object CostEstimatorRepo {
         }
 
         Log.d("metadata", "tableMetaDatas: ${tableMetadatas[0]} + ${tableMetadatas[1]}")
-        Log.d("empMetadata", "empBfr, empBlk, empRow: ${empBfr} + ${empBlk} + ${empRowCount}")
         //OPERATOR SELECT
         if (writtenQuery[0].equals("SELECT", ignoreCase = true)) {
             Log.d("Operator", "handleQuery: Selectooooo")
@@ -219,53 +209,74 @@ object CostEstimatorRepo {
             // join format: JOIN "table1 table2 #buffers"
             Log.d("Operator", "handleQuery: Joinoooo")
 
-            var outerTable = TableClass()
-            var innerTable = TableClass()
-            //initializing the outer table
-            if (writtenQuery[1].equals("Employee", ignoreCase = true)){
-                //outerTable = TableClass(writtenQuery[1], empBfr, empBlk, empRowCount)
-                outerTable.tableName = writtenQuery[1]
-                outerTable.bfr = empBfr
-                outerTable.blockCount = empBlk
-                outerTable.rowCount = empRowCount
-                Log.d("outerT", "outertable: ${outerTable.tableName} + ${outerTable.bfr} + ${outerTable.blockCount} + ${outerTable.rowCount}")
-                println(outerTable)
-            } else if (writtenQuery[1].equals("Project", ignoreCase = true)){
-                //outerTable = TableClass(writtenQuery[1], projBfr, projBlk, projRowCount)
-                outerTable.tableName = writtenQuery[1]
-                outerTable.bfr = projBfr
-                outerTable.blockCount = projBlk
-                outerTable.rowCount = projRowCount
-                Log.d("outerT", "outertable: ${outerTable.tableName} + ${outerTable.bfr} + ${outerTable.blockCount} + ${outerTable.rowCount}")
-                println(outerTable)
-            }
 
-            //initializing the inner table
-            if (writtenQuery[2].equals("Employee", ignoreCase = true)){
-                //innerTable = TableClass(writtenQuery[2], empBfr, empBlk, empRowCount)
-                innerTable.tableName = writtenQuery[2]
-                innerTable.bfr = empBfr
-                innerTable.blockCount = empBlk
-                innerTable.rowCount = empRowCount
-                Log.d("innerT", "innerT: ${innerTable.tableName} + ${innerTable.bfr} + ${innerTable.blockCount} + ${innerTable.rowCount}")
-            } else if (writtenQuery[2].equals("Project", ignoreCase = true)){
-                //innerTable = TableClass(writtenQuery[2], projBfr, projBlk, projRowCount)
-                innerTable.tableName = writtenQuery[2]
-                innerTable.bfr = projBfr
-                innerTable.blockCount = projBlk
-                innerTable.rowCount = projRowCount
-                Log.d("innerT", "innerT: ${innerTable.tableName} + ${innerTable.bfr} + ${innerTable.blockCount} + ${innerTable.rowCount}")
-            }
-
-            //initializing number of Buffers (for J1 algorithm)
-            var noOfBuffers = writtenQuery[3].toInt()
-
-            var Costs = JoinCostEstimator.getJoinCost(outerTable,innerTable, empMetadatas, projectMetadatas,
-                indexMetadatas,noOfBuffers)
-            Log.d("Join Costs", "Costs: ${Costs.entries}")
-
-            queryType = QUERY_TYPE.JOIN
         }
+    }
+
+
+    fun handleJoin(selectedOuterTable : String, selectedInnerTable : String, selectedNoOfBuffers : Int, innerTableHasHash : Boolean): Map<String, Double> {
+        // From table metadata ------------------------------------------------------------------------------------
+        val empBfr = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.bfr
+        val projBfr = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.bfr
+
+        val empBlk = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.blockCount
+        val projBlk = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.blockCount
+
+        val empRowCount = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.rowCount
+        val projRowCount = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.rowCount
+
+        Log.d("empMetadata", "empBfr, empBlk, empRow: ${empBfr} + ${empBlk} + ${empRowCount}")
+
+        val outerTable = TableClass()
+        val innerTable = TableClass()
+
+        //initializing the outer table
+        if (selectedOuterTable.equals("Employee", ignoreCase = true)){
+            //outerTable = TableClass(writtenQuery[1], empBfr, empBlk, empRowCount)
+            outerTable.tableName = selectedOuterTable
+            outerTable.bfr = empBfr
+            outerTable.blockCount = empBlk
+            outerTable.rowCount = empRowCount
+            Log.d("outerT", "outertable: ${outerTable.tableName} + ${outerTable.bfr} + ${outerTable.blockCount} + ${outerTable.rowCount}")
+            println(outerTable)
+        } else if (selectedOuterTable.equals("Project", ignoreCase = true)){
+            //outerTable = TableClass(writtenQuery[1], projBfr, projBlk, projRowCount)
+            outerTable.tableName = selectedOuterTable
+            outerTable.bfr = projBfr
+            outerTable.blockCount = projBlk
+            outerTable.rowCount = projRowCount
+            Log.d("outerT", "outertable: ${outerTable.tableName} + ${outerTable.bfr} + ${outerTable.blockCount} + ${outerTable.rowCount}")
+            println(outerTable)
+        }
+
+        //initializing the inner table
+        if (selectedInnerTable.equals("Employee", ignoreCase = true)){
+            //innerTable = TableClass(writtenQuery[2], empBfr, empBlk, empRowCount)
+            innerTable.tableName = selectedInnerTable
+            innerTable.bfr = empBfr
+            innerTable.blockCount = empBlk
+            innerTable.rowCount = empRowCount
+            Log.d("innerT", "innerT: ${innerTable.tableName} + ${innerTable.bfr} + ${innerTable.blockCount} + ${innerTable.rowCount}")
+        } else if (selectedInnerTable.equals("Project", ignoreCase = true)){
+            //innerTable = TableClass(writtenQuery[2], projBfr, projBlk, projRowCount)
+            innerTable.tableName = selectedInnerTable
+            innerTable.bfr = projBfr
+            innerTable.blockCount = projBlk
+            innerTable.rowCount = projRowCount
+            Log.d("innerT", "innerT: ${innerTable.tableName} + ${innerTable.bfr} + ${innerTable.blockCount} + ${innerTable.rowCount}")
+        }
+
+        //initializing number of Buffers (for J1 algorithm)
+        var noOfBuffers = selectedNoOfBuffers
+
+        var Costs = JoinCostEstimator.getJoinCost(outerTable,innerTable, empMetadatas, projectMetadatas,
+            indexMetadatas,noOfBuffers, innerTableHasHash)
+
+        Log.d("Join Costs", "Costs: ${Costs.entries}")
+
+        queryType = QUERY_TYPE.JOIN
+
+        return Costs
     }
 
 //    fun getJoinCost() : Map<String, Double> {

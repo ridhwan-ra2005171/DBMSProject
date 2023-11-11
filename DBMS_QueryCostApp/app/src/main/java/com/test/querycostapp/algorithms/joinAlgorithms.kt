@@ -31,8 +31,9 @@ object joinAlgorithms {
                              sB: Double?, // selection cardinality for inner table attribute B
                              bfrRS : Int?,
                              hasSecondaryIndex : Boolean, hasClusterIndex : Boolean, hasPrimaryIndex : Boolean,
-                             innerHashIndex : Boolean, outerHasHashIndex : Boolean,
+                             innerTableHasHash: Boolean,
                              ) : Map<String, Double> {
+
 
         var c1 = 0.0; var c2 =0.0; var c3 =0.0; var c4 = 0.0
 
@@ -61,12 +62,9 @@ object joinAlgorithms {
         // CJ2d = bR + (|R| * h) + ((js * |R| * |S|)/bfrRS)
         // h is the average number of block accesses to retrieve a record, given its hash key value
         val h = 1.2
-        // if the innner table has a hash index (innerHashIndex = true) use the above formula
-        if (innerHashIndex && outerHasHashIndex == false) {
+        // if the inner table has a hash index (innerHashIndex = true) use the above formula
+        if (innerTableHasHash) {
             c4 = bR!! + ( R!! * h ) + term3
-        } else { // if both tables (inner and outer) have hash index modify the formula to be
-                 // bR + (|R| * h) + (h * |S|) + ((js * |R| * |S|)/bfrRS)
-            c4 = bR!! + ( R!! * h ) + (h * S!!) + term3
         }
 
         // return a map of the cost functions in descending order
@@ -125,7 +123,7 @@ fun main(args: Array<String>) {
         hasPrimaryIndex = true, bfrRS = 4, js = (1.0/125.0), bR = 2000,
         R = 10000, S = 125, xB = 1,
         sB = 1.0, hasClusterIndex = false, hasSecondaryIndex = false,
-        innerHashIndex = true, outerHasHashIndex = false
+        innerTableHasHash = false
     )
     println("J2 Index-based nested-loop join: \n$j2")
 

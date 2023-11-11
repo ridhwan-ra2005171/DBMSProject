@@ -14,11 +14,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -32,8 +29,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -44,7 +39,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -55,7 +49,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import com.test.querycostapp.repo.CostEstimatorRepo
-import com.test.querycostapp.repo.JoinCostEstimator
 
 @Preview
 @Composable
@@ -75,13 +68,15 @@ fun JoinScreen() {
 
     var bufferNo by rememberSaveable { mutableStateOf(3)}
 
-    var employeeHasHash by rememberSaveable { mutableStateOf(false)}
-    var projectHasHash by rememberSaveable { mutableStateOf(false)}
+    var innerTableHasHash by rememberSaveable { mutableStateOf(false)}
 
     var resetClicked by rememberSaveable { mutableStateOf(false)}
 
-    var costList by rememberSaveable {
-        mutableStateOf(mapOf( "Example 1" to 0.0, "Example 2" to 0.0, "Example 3" to 0.0))
+    var costList : Map<String, Double> by rememberSaveable {
+        mutableStateOf(
+            emptyMap()
+//            mapOf( "Example 1" to 0.0, "Example 2" to 0.0, "Example 3" to 0.0)
+        )
     }
 
     // we must have a table chooser, then a buffer size chooser
@@ -90,12 +85,12 @@ fun JoinScreen() {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(15.dp)
+        verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
 
         // Prompt to select outer table
         Text (text = "Select an Outer Table", modifier = Modifier
-            .padding(5.dp)
+            .padding( 5.dp)
             .fillMaxWidth(),
             color = MaterialTheme.colorScheme.onPrimaryContainer,
             style = TextStyle(fontSize = MaterialTheme.typography.titleLarge.fontSize, fontWeight = FontWeight.Bold))
@@ -142,31 +137,31 @@ fun JoinScreen() {
                 )
                 Divider(color = MaterialTheme.colorScheme.primaryContainer, thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 15.dp))
 
-                //  checkbox to assume that the table has hash key on their respective attributes
+                //  checkbox to assume that the table has a hash key on the attribute
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(checked = employeeHasHash, onCheckedChange = { employeeHasHash = it } )
+                        Checkbox(checked = innerTableHasHash, onCheckedChange = { innerTableHasHash = it } )
                         Text(
-                            text = "Assume Hash on Employee for attribute SSN",
+                            text = "Assume a Hash-key exists on ${innerTable} for attribute ${innerTableAttr}, with (h = 1.2)",
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(start = 0.dp)
                         )
                     }
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(checked = projectHasHash, onCheckedChange =  { projectHasHash = it} )
-                        Text(
-                            text = "Assume Hash on Project for attribute ManagedBy",
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(start = 0.dp)
-                        )
-                    }
+//                    Row(verticalAlignment = Alignment.CenterVertically) {
+//                        Checkbox(checked = projectHasHash, onCheckedChange =  { projectHasHash = it} )
+//                        Text(
+//                            text = "Assume Hash on Project for attribute ManagedBy",
+//                            style = MaterialTheme.typography.bodyMedium,
+//                            modifier = Modifier.padding(start = 0.dp)
+//                        )
+//                    }
                 }
 
                 // Button to calculate the cost
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth().padding(10.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
                     // Calculate cost button
-                    Button(modifier = Modifier,
+                    Button(modifier = Modifier.padding(end = 10.dp),
                         onClick = {
                             if (outerTable.isEmpty()) {
                                 // Display you need to choose a table
@@ -174,7 +169,12 @@ fun JoinScreen() {
                                     .show()
                             } else {
                                 // Here we call the Join Cost Estimator
-//                    JoinCostEstimator.getJoinCost(noOfBuffers = bufferSize.toInt())
+                                costList = CostEstimatorRepo.handleJoin(
+                                    selectedOuterTable = outerTable,
+                                    selectedInnerTable = innerTable,
+                                    selectedNoOfBuffers = bufferNo,
+                                    innerTableHasHash = innerTableHasHash
+                                )
                                 showCosts = true
                             }
 
@@ -194,8 +194,7 @@ fun JoinScreen() {
                             innerTable = ""
                             bufferNo = 3
                             showCosts = false
-                            employeeHasHash = false
-                            projectHasHash = false
+                            innerTableHasHash = false
                             resetClicked = true
                         }) {
                         Text(text = "Reset")
@@ -203,9 +202,6 @@ fun JoinScreen() {
 
 
                 }
-
-
-
             }
         }
 
@@ -224,9 +220,9 @@ fun JoinScreen() {
                     )
                 }
 
-                items(costList.entries.toList()) { (key, value) ->
+                items(costList.entries.toList()) { (joinAlgo, joinCost) ->
 
-                    CostItem(key = key, value = value.toString())
+                    CostItem(key = joinAlgo, value = joinCost.toInt().toString())
 
                     Divider(
                         color = MaterialTheme.colorScheme.tertiary,
@@ -387,28 +383,6 @@ fun CustomDropDown(
     }
 }
 
-@Composable
-fun CustomCheckBox() {
-    Column {
-        Row {
-            Checkbox(checked = false, onCheckedChange = {} )
-            Text(
-                text = "Assume Hash on Outer Table",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(start = 16.dp)
-            )
-        }
-
-        Row {
-            Checkbox(checked = false, onCheckedChange = {} )
-            Text(
-                text = "Assume Hash on Inner Table",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(start = 16.dp)
-            )
-        }
-    }
-}
 
 @Composable
 fun CostItem(key : String, value : String) {

@@ -14,7 +14,9 @@ object JoinCostEstimator {
                     empMetadata : MutableList<EmployeeMetadata>,
                     projectMetadata: MutableList<ProjectMetadata>,
                     indexMetadata : MutableList<IndexMetadata>,
-                    noOfBuffers : Int) : Map<String, Double> {
+                    noOfBuffers : Int,
+                    innerTableHasHash : Boolean
+    ) : Map<String, Double> {
         val js = 1.0 / Math.max(
             empMetadata.find { it.EmpAttribute.equals("SSN", ignoreCase = true) }?.NDV!!,
             projectMetadata.find { it.ProjAttribute.equals("ManagedBy", ignoreCase = true) }?.NDV!!
@@ -47,10 +49,10 @@ object JoinCostEstimator {
             hasPrimaryIndex = checkIfIndexExists("Employee_SSN", "Primary", indexMetadata)
         }
 
-        var hasHashIndex = checkIfIndexExists("Project_managedBy", "Hash", indexMetadata)
-        if (innerTable.tableName.equals("Employee", ignoreCase = true)) {
-            hasHashIndex = checkIfIndexExists("Employee_SSN", "Hash", indexMetadata)
-        }
+//        var hasHashIndex = checkIfIndexExists("Project_managedBy", "Hash", indexMetadata)
+//        if (innerTable.tableName.equals("Employee", ignoreCase = true)) {
+//            hasHashIndex = checkIfIndexExists("Employee_SSN", "Hash", indexMetadata)
+//        }
 
         // J1 - Nested-loop join --------------
         val CJ1 = joinAlgorithms.J1NestedLoopJoinCost( bR, bS, js, R, S, bfrRS, nB)
@@ -59,7 +61,7 @@ object JoinCostEstimator {
         val CJ2 = joinAlgorithms.J2IndexBasedJoinCost(
             js, bR, R, S, nB, sB, bfrRS,
             hasSecondaryIndex, hasClusterIndex, hasPrimaryIndex,
-            innerHashIndex = true, outerHasHashIndex = false )
+            innerTableHasHash = innerTableHasHash )
         // Storing the cost of each join in an object each (deconstructing the CJ2 list)
         val (CJ2a, CJ2b, CJ2c, CJ2d) = CJ2.values.toList()
 
@@ -70,7 +72,14 @@ object JoinCostEstimator {
         val CJ4 = joinAlgorithms.J4PartitionHashJoinCost(bR, bS, js, R, S, bfrRS)
 
         // The costs of each join, stored in a list
-        val cost_list = mutableMapOf<String, Double>("CJ1" to CJ1, "CJ2a" to CJ2a, "CJ2b" to CJ2b, "CJ2c" to CJ2c, "CJ2d" to CJ2d, "CJ3" to CJ3, "CJ4" to CJ4)
+        val cost_list = mutableMapOf<String, Double>(
+            "CJ1 - Nested-Loop join" to CJ1,
+            "CJ2a - Index-based join (Secondary Index)" to CJ2a,
+            "CJ2b - Index-based join (Cluster Index)" to CJ2b,
+            "CJ2c - Index-based join (Primary Index)" to CJ2c,
+            "CJ2d - Index-based join (Hash Index)" to CJ2d,
+            "CJ3 - Sort-merge join" to CJ3,
+            "CJ4 - Partition-hash join" to CJ4)
         return cost_list.filter {it.value > 0}.toList().sortedBy { (_, value) -> value}.toMap()
     }
 
