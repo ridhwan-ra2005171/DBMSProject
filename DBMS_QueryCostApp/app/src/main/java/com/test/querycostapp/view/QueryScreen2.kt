@@ -2,13 +2,17 @@ package com.example.dbmsphase2.view
 
 import android.util.Log
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -22,6 +26,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,10 +39,13 @@ import com.test.querycostapp.repo.dataRepos.IndexMetaRepo
 import com.test.querycostapp.repo.dataRepos.ProjMetaRepo
 import com.test.querycostapp.repo.dataRepos.ProjectRepo
 import com.test.querycostapp.repo.dataRepos.TablesMetaRepo
+import com.test.querycostapp.view.CostItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QueryScreen2() {
+    var showCosts by rememberSaveable { mutableStateOf(false) }
+
     var queryText by rememberSaveable { mutableStateOf("") }
     var queryResult by rememberSaveable { mutableStateOf("") }
     var queryTokens = queryResult.split(Regex("\\s+")) // Tokenize by whitespace
@@ -87,18 +96,47 @@ fun QueryScreen2() {
             onClick = {
                 // When the button is pressed, update queryResult
                 queryResult = queryText;
-                handleQuery()
+                handleQuery();
+                showCosts = !showCosts //toggle the showCosts
             }
         ) {
-            Text(text = "Done")
+            Text(text = "Show Cost")
         }
         CostEstimatorRepo.writtenQuery= queryTokens.toMutableList();
 
         // Display queryResult when it's not empty
         if (queryResult.isNotEmpty()) {
-            Text(text = queryResult)
+            Text(text = queryResult, style= TextStyle(fontWeight = FontWeight.Bold))
             Log.d("tokens", "QueryScreen2: ${queryTokens}")
             Log.d("writtenQuery", "QueryScreen2: ${CostEstimatorRepo.writtenQuery}")
+        }
+
+        if (showCosts) {
+            // List of costs here
+            LazyColumn(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                item {
+                    Text(
+//                        textAlign = TextAlign.Center,
+                        text = "Cost of Different Selections",
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+//                items(costList.entries.toList()) { (joinAlgo, joinCost) ->
+//
+//                    CostItem(key = joinAlgo, value = joinCost.toInt().toString())
+//
+//                    Divider(
+//                        color = MaterialTheme.colorScheme.tertiary,
+//                        thickness = 0.5.dp,
+//                        modifier = Modifier.padding(vertical = 5.dp)
+//                    )
+//
+//                }
+            }
         }
     }
 }

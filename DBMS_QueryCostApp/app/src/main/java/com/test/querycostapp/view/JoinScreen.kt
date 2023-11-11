@@ -2,6 +2,7 @@
 
 package com.test.querycostapp.view
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -50,6 +51,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import com.test.querycostapp.repo.CostEstimatorRepo
 
+@RequiresApi(Build.VERSION_CODES.O)
+@SuppressLint("SuspiciousIndentation", "UnrememberedMutableState")
 @Preview
 @Composable
 fun JoinScreen() {
@@ -236,6 +239,7 @@ fun JoinScreen() {
     }
 }
 
+@SuppressLint("UnrememberedMutableState")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TableChooser(tablesList : List<String>, resetClicked : Boolean, selectedItem : MutableState<String>, onItemSelected : (String, String) -> Unit, onBufferNoChanged : (Int) -> Unit) {
