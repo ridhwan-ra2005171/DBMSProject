@@ -226,13 +226,13 @@ object CostEstimatorRepo {
 //                    S3b------
                     var cost3b = S3bHashKeySelectCost() //[Working]
 //                    S6a------
-//                    var costS6a = S6SecondaryIndexCost(rowCount!!,1.0,empBfr!!)
+                    var costS6a = S6SecondaryIndexCost(x!!,true,false)
 
                     Log.d("PKequality", "costS1a:  ${costS1a} ")
                     Log.d("PKequality", "costS2a:  ${costS2a} ")
                     Log.d("PKequality", "cost3a:  ${cost3a} ")
                     Log.d("PKequality", "cost3b:  ${cost3b} ")
-
+                    Log.d("PKequality", "costS6a:  ${costS6a} ")
 
 
                 } else if (writtenQuery.contains(">=") || writtenQuery.contains("<=")|| writtenQuery.contains("<")|| writtenQuery.contains(">")) {
@@ -261,7 +261,7 @@ object CostEstimatorRepo {
 
                     Log.d("NPKequality", "costS1b:  ${costS1b} ")
                     Log.d("NPKequality", "costS2b:  ${costS2b} ")
-                    Log.d("NPKequality", "costS6ab:  ${costS6ab} ")
+                    Log.d("NPKequality", "costS6a Nonkey:  ${costS6ab} ")
 
                 } else if (writtenQuery.contains("HireDate") && writtenQuery.contains(">=") || writtenQuery.contains("<=") || writtenQuery.contains("<")|| writtenQuery.contains(">")) {
                     // Non-Primary Key using Range Operator
@@ -313,6 +313,8 @@ object CostEstimatorRepo {
 
 //                    S6a------
 //                    var costS6a = S6SecondaryIndexCost(rowCount!!,1.0,empBfr!!)
+                    var costS6a = S6SecondaryIndexCost(x!!,true,false)
+                    Log.d("PKequality2", "costS6a:  ${costS6a} ")
 
 
 
@@ -348,7 +350,7 @@ object CostEstimatorRepo {
 
                     //S6ab secondary index on a non-key attribute with an equality condition
                     var costS6ab = S6SecondaryIndexCost(x!!,false,false,s!!,projBfr!!)
-                    Log.d("NPKequality2", "costS6ab:  ${costS6ab} ")
+                    Log.d("NPKequality2", "costS6a nonkey:  ${costS6ab} ")
 
 
 
