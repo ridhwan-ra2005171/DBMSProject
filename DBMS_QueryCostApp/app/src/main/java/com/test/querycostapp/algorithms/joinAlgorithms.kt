@@ -8,12 +8,8 @@ object joinAlgorithms {
 
     // J1—Nested-loop join
     fun J1NestedLoopJoinCost(bR: Int?, bS: Int?, js: Double?, R: Int?, S: Int?, bfrRS: Int?, nB: Int) : Double{
-        val CJ1 = if(nB == 3){
-            bR!! + (bR * bS!!) + (js!! * R!! * S!!) / bfrRS!!.toDouble()
-        }else{
-            bR!! + (ceil((bR!!/(nB-2)).toDouble()) * bS!!) + (js!! * R!! * S!!) / bfrRS!!.toDouble()
-        }
-        return CJ1
+
+        return  bR!! + (ceil((bR!!/(nB-2)).toDouble()) * bS!!) + (js!! * R!! * S!!) / bfrRS!!.toDouble()
     }
 
 
@@ -84,19 +80,23 @@ fun J3SortMergeJoinCost(
     R: Int?, // Number of records in the outer table
     S: Int?, // Number of records in the inner table
     bfrRS: Int?, // Blocking factor of R and S
-    sortingNeeded: Boolean // Whether sorting is needed on join attribute
+    outerSorted: Boolean, // Whether outer table is sorted
+    innerSorted: Boolean // Whether inner table is sorted
 ): Double {
     // CJ3a = bR + bS + ((js * R * S) / bfrRS)
     val CJ3a = bR!! + bS!! + (js!! * R!! * S!!) / bfrRS!!.toDouble()
+    val dM = 10 // Assuming dM (M-way merge) is a constant value
+    val nR = R!! + S!! // Combined number of records in R and S
 
-    return if (sortingNeeded) {
-        // If sorting is needed, add (2 * b) + (2 * b * (logdM nR))
-        val dM = 10 // Assuming dM (M-way merge) is a constant value
-        val nR = R!! + S!! // Combined number of records in R and S
+    return if (!outerSorted && !innerSorted) {
+        // If sorting is needed on both tables, add 2 * ((2 * b) + (2 * b * (logdM nR)))
+        CJ3a + 2 * ((2 * bR!!) + (2 * bR!! * log(dM.toDouble(), nR.toDouble())).roundToInt().toDouble())
 
+    } else if (!outerSorted && innerSorted || outerSorted && !innerSorted) {
+        // If sorting is needed only on 1 table, return CJ3a + sort cost as the cost
         CJ3a + (2 * bR!!) + (2 * bR!! * log(dM.toDouble(), nR.toDouble())).roundToInt().toDouble()
     } else {
-        // If sorting is not needed, return CJ3a as the cost
+        // No sorting needed
         CJ3a
     }
 }
@@ -130,11 +130,11 @@ fun main(args: Array<String>) {
 
     //J3 - Sort-merge join
     val j3Cost1 = joinAlgorithms.J3SortMergeJoinCost(
-        bR = 2000, bS = 125, js = (1.0/125.0), R = 10000, S = 125, bfrRS = 4, sortingNeeded = true
+        bR = 2000, bS = 125, js = (1.0/125.0), R = 10000, S = 125, bfrRS = 4, outerSorted = true, innerSorted = true
     )
     println("J3 Sort-merge join not sorted: \n$j3Cost1")
     val j3Cost2 = joinAlgorithms.J3SortMergeJoinCost(
-        bR = 2000, bS = 125, js = (1.0/125.0), R = 10000, S = 125, bfrRS = 4, sortingNeeded = false
+        bR = 2000, bS = 125, js = (1.0/125.0), R = 10000, S = 125, bfrRS = 4, outerSorted = false, innerSorted = true
     )
     println("J3 Sort-merge join sorted: \n$j3Cost2")
 
