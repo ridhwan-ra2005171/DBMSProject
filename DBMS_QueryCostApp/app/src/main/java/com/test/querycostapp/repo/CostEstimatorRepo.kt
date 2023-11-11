@@ -210,13 +210,13 @@ object CostEstimatorRepo {
                     Log.d("queryType", "Primary Key and Equality Operator")
                     var primaryKey = writtenQuery[writtenQuery.indexOf("SSN")] //position of primary key
 //                    var primaryKeyValue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
-
+                    var targetvalue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
 
                     Log.d("primarykey", "primaryKey ${primaryKey} ")
                     Log.d("primarykey", "blockCount ${blockCount} ")
 //                    Log.d("primarykey", "primaryKeyValue ${primaryKeyValue} ")
 //                    S1a-----
-                    var isFound = valueExists(primaryKey, "SSN", employees)
+                    var isFound = valueExists(targetvalue, "SSN", employees)
                     var costS1a = S1LinearSearch(notFound = isFound, unique = true, equality = true, blockCount = blockCount!!)
 //                    S2a------
                     var costS2a = S2BinarySearchCost(blockCount!!,1.0,empBfr!!) //S=1 since its unique [WORKING]
@@ -245,9 +245,12 @@ object CostEstimatorRepo {
                     var s = empMetadatas.firstOrNull { it.EmpAttribute.equals(selectedAttribute, ignoreCase = true) }?.selectionCardinality //Selection Cardinality of attribute selected
                     Log.d("NPK", "selectedAttribute:  ${selectedAttribute}")
                     Log.d("NPK", "s: ${s}")
+                    var targetvalue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
 
 
                     //S1b
+                    var isfound = valueExists(targetvalue, selectedAttribute, employees)
+                    var costS1b = S1LinearSearch(notFound = false, unique = false, equality = true, blockCount = blockCount!!)
 
                     //S2b
                     var costS2b = S2BinarySearchCost(blockCount!!,s!!,empBfr!!) // [WORKING]
@@ -256,7 +259,7 @@ object CostEstimatorRepo {
                     //S6ab secondary index on a non-key attribute with an equality condition
                     var costS6ab = S6SecondaryIndexCost(x!!,false,false,s!!,empBfr!!)
 
-
+                    Log.d("NPKequality", "costS1b:  ${costS1b} ")
                     Log.d("NPKequality", "costS2b:  ${costS2b} ")
                     Log.d("NPKequality", "costS6ab:  ${costS6ab} ")
 
