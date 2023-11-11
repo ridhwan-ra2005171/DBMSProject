@@ -381,7 +381,6 @@ object CostEstimatorRepo {
         val empRowCount = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.rowCount
         val projRowCount = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.rowCount
 
-
         Log.d("empMetadata", "empBfr, empBlk, empRow: ${empBfr} + ${empBlk} + ${empRowCount}")
 
         val outerTable = TableClass()
@@ -413,7 +412,6 @@ object CostEstimatorRepo {
             innerTable.bfr = empBfr
             innerTable.blockCount = empBlk
             innerTable.rowCount = empRowCount
-            innerTable.xB = find_xB(innerTable.tableName, indexMetadatas)
             Log.d("innerT", "innerT: ${innerTable.tableName} + ${innerTable.bfr} + ${innerTable.blockCount} + ${innerTable.rowCount}")
         } else if (selectedInnerTable.equals("Project", ignoreCase = true)){
             //innerTable = TableClass(writtenQuery[2], projBfr, projBlk, projRowCount)
@@ -421,7 +419,6 @@ object CostEstimatorRepo {
             innerTable.bfr = projBfr
             innerTable.blockCount = projBlk
             innerTable.rowCount = projRowCount
-            innerTable.xB = find_xB(innerTable.tableName, indexMetadatas)
             Log.d("innerT", "innerT: ${innerTable.tableName} + ${innerTable.bfr} + ${innerTable.blockCount} + ${innerTable.rowCount}")
         }
 
@@ -478,10 +475,3 @@ object CostEstimatorRepo {
 
 }
 
-fun find_xB(tableName : String, indexMetadata: MutableList<IndexMetadata>) : Int? {
-    return if (tableName.equals("Employee", ignoreCase = true)){
-        indexMetadata.find { it.indexName.equals("Employee_SSN", ignoreCase = true) }?.level
-    } else {
-        indexMetadata.find { it.indexName.equals("Project_managedBy", ignoreCase = true) }?.level
-    }
-}

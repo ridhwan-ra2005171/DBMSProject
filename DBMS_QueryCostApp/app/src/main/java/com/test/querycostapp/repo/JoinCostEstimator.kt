@@ -27,7 +27,7 @@ object JoinCostEstimator {
         val R = innerTable.rowCount
         val S = outerTable.rowCount
         val bfrRS = outerTable.bfr
-        val xB = innerTable.xB
+        val xB = 1
         val nB = noOfBuffers
 
         val sB = empMetadata.find { it.EmpAttribute.equals("SSN", ignoreCase = true) }?.selectionCardinality!!
@@ -66,53 +66,21 @@ object JoinCostEstimator {
 //        }
 
         // J1 - Nested-loop join --------------
-        val CJ1 = joinAlgorithms.J1NestedLoopJoinCost(
-            bR = bR,
-            bS = bS,
-            js = js,
-            R = R,
-            S = S,
-            bfrRS = bfrRS,
-            nB = nB
-        )
+        val CJ1 = joinAlgorithms.J1NestedLoopJoinCost( bR, bS, js, R, S, bfrRS, nB)
 
         // J2 - Index Based join
         val CJ2 = joinAlgorithms.J2IndexBasedJoinCost(
-            js = js,
-            bR = bR,
-            R = R,
-            S = S,
-            xB = xB,
-            sB = sB,
-            bfrRS = bfrRS,
-            hasSecondaryIndex = hasSecondaryIndex,
-            hasClusterIndex = hasClusterIndex,
-            hasPrimaryIndex = hasPrimaryIndex,
+            js, bR, R, S, xB, sB, bfrRS,
+            hasSecondaryIndex, hasClusterIndex, hasPrimaryIndex,
             innerTableHasHash = innerTableHasHash )
         // Storing the cost of each join in an object each (deconstructing the CJ2 list)
         val (CJ2a, CJ2b, CJ2c, CJ2d) = CJ2.values.toList()
 
         // J3 - Sort-merge join
-        val CJ3 = joinAlgorithms.J3SortMergeJoinCost(
-            bR = bR,
-            bS = bS,
-            js = js,
-            R = R,
-            S = S,
-            bfrRS = bfrRS,
-            outerSorted = outerSorted,
-            innerSorted = innerSorted
-        ) //figure out sorting needed
+        val CJ3 = joinAlgorithms.J3SortMergeJoinCost(bR, bS, js, R, S, bfrRS, outerSorted,innerSorted) //figure out sorting needed
 
         // J4 - Partition-hash join
-        val CJ4 = joinAlgorithms.J4PartitionHashJoinCost(
-            bR = bR,
-            bS = bS,
-            js = js,
-            R = R,
-            S = S,
-            bfrRS = bfrRS
-        )
+        val CJ4 = joinAlgorithms.J4PartitionHashJoinCost(bR, bS, js, R, S, bfrRS)
 
         // The costs of each join, stored in a list
         val cost_list = mutableMapOf<String, Double>(
