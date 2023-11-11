@@ -24,3 +24,9 @@ SELECT * FROM PROJECT WHERE ProjectName = 'Project B';
 SELECT * FROM PROJECT WHERE ManagedBy BETWEEN 'Manager 1' AND 'Manager 2';
 
 
+//--------------------------------
+Primary Key and Equality Operator:
+S1a
+S2a
+S3b
+S6a

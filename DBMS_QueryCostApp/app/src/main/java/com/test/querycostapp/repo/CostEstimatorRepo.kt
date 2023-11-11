@@ -1,7 +1,10 @@
 package com.test.querycostapp.repo
 
 import android.util.Log
-import androidx.core.graphics.component1
+import com.test.querycostapp.algorithms.searchAlgorithms.S1LinearSearch
+import com.test.querycostapp.algorithms.searchAlgorithms.S2BinarySearchCost
+import com.test.querycostapp.algorithms.searchAlgorithms.S3bHashKeySelectCost
+import com.test.querycostapp.algorithms.searchAlgorithms.S6SecondaryIndexCost
 import com.test.querycostapp.model.Employee
 import com.test.querycostapp.model.EmployeeMetadata
 import com.test.querycostapp.model.IndexMetadata
@@ -195,15 +198,33 @@ object CostEstimatorRepo {
             if(tableName.equals("Employee", ignoreCase = true)){ //handles employee table
                 Log.d("tablename", "Table Name: $tableName")
 
+                var blockCount = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.blockCount
+                var rowCount = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.rowCount
+                var empBfr = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.bfr
+
                 // Check query type for Employee table
                 if (writtenQuery.contains("SSN") && writtenQuery.contains("=")) {
                     // Primary Key and Equality Operator
                     Log.d("queryType", "Primary Key and Equality Operator")
                     var primaryKey = writtenQuery[writtenQuery.indexOf("SSN")] //position of primary key
-                    var primaryKeyValue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
+//                    var primaryKeyValue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
+
 
                     Log.d("primarykey", "primaryKey ${primaryKey} ")
+                    Log.d("primarykey", "blockCount ${blockCount} ")
 //                    Log.d("primarykey", "primaryKeyValue ${primaryKeyValue} ")
+//                    S1a-----
+//                    S1LinearSearch(notFound = false, unique = true, equality = true, blockCount = 2000)
+//                    S2a------
+                    var costS2a = S2BinarySearchCost(blockCount!!,1.0,empBfr!!) //S=1 since its unique [WORKING]
+
+//                    S3b------
+                    var cost3b = S3bHashKeySelectCost() //[Working]
+//                    S6a------
+//                    var costS6a = S6SecondaryIndexCost(rowCount!!,1.0,empBfr!!)
+
+                    Log.d("PKequality", "costS2a:  ${costS2a} ")
+                    Log.d("PKequality", "cost3b:  ${costS2a} ")
 
 
                 } else if (writtenQuery.contains(">=") || writtenQuery.contains("<=")|| writtenQuery.contains("<")|| writtenQuery.contains(">")) {

@@ -37,7 +37,7 @@ object searchAlgorithms{
             // When s is 1 (equality on a unique key attribute)
             log2(b.toDouble())
         } else {
-            // For other scenarios
+            // For other scenarios if not on unique key
             log2(b.toDouble()) + ceil(s / bfr) - 1
         }
     }
