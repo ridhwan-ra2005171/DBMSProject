@@ -180,13 +180,13 @@ object CostEstimatorRepo {
     //var projRowCount = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.rowCount
 
 
-    fun handleSelection(): MutableList<Pair<String, Double>> {
+    fun handleSelection(): MutableList<Pair<String, Int>> {
 
 
 //        Log.d("Operator", "handleQuery: ${writtenQuery[0]}")
 //        Log.d("employees", "${employees} ")
 //        Log.d("projects", "${projects} ")
-        var selectcostList: MutableList<Pair<String, Double>> = mutableListOf() //to store it for displaying
+        var selectcostList: MutableList<Pair<String, Int>> = mutableListOf() //to store it for displaying
         // Clear the contents of the costList
         selectcostList.clear()
 
@@ -238,11 +238,11 @@ object CostEstimatorRepo {
                     Log.d("PKequality", "cost3b:  ${cost3b} ")
                     Log.d("PKequality", "costS6a:  ${costS6a} ")
 
-                    selectcostList.add("costS1a" to costS1a)
-                    selectcostList.add("costS2a" to costS2a)
-                    selectcostList.add("cost3a" to cost3a.toDouble())
-                    selectcostList.add("cost3b" to cost3b)
-                    selectcostList.add("costS6a" to costS6a)
+                    selectcostList.add("costS1a" to costS1a.toInt())
+                    selectcostList.add("costS2a" to costS2a.toInt())
+                    selectcostList.add("cost3a" to cost3a)
+//                    selectcostList.add("cost3b" to cost3b.toInt())
+                    selectcostList.add("costS6a" to costS6a.toInt())
 
 
 
@@ -275,6 +275,13 @@ object CostEstimatorRepo {
                     Log.d("NPKequality", "costS1b:  ${costS1b} ")
                     Log.d("NPKequality", "costS2b:  ${costS2b} ")
                     Log.d("NPKequality", "costS6a Nonkey:  ${costS6ab} ")
+
+                    selectcostList.add("costS1b" to costS1b.toInt())
+                    selectcostList.add("costS2b" to costS2b.toInt())
+                    selectcostList.add("costS6ab" to costS6ab.toInt())
+
+                    return selectcostList
+
 
                 } else if (writtenQuery.contains("HireDate") && writtenQuery.contains(">=") || writtenQuery.contains("<=") || writtenQuery.contains("<")|| writtenQuery.contains(">")) {
                     // Non-Primary Key using Range Operator
@@ -330,7 +337,13 @@ object CostEstimatorRepo {
                     Log.d("PKequality2", "costS6a:  ${costS6a} ")
 
 
+                    selectcostList.add("costS1b" to costS1a.toInt())
+                    selectcostList.add("costS2b" to costS2a.toInt())
+                    selectcostList.add("costS6ab" to cost3a.toInt())
+//                    selectcostList.add("costS6ab" to cost3b.toInt())
+                    selectcostList.add("costS6ab" to costS6a.toInt())
 
+                    return selectcostList
 
 
 
@@ -366,7 +379,11 @@ object CostEstimatorRepo {
                     Log.d("NPKequality2", "costS6a nonkey:  ${costS6ab} ")
 
 
+                    selectcostList.add("costS1b" to costS1b.toInt())
+                    selectcostList.add("costS2b" to costS2b.toInt())
+                    selectcostList.add("costS6ab" to costS6ab.toInt())
 
+                    return selectcostList
 
 
 

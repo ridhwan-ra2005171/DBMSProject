@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.test.querycostapp.repo.CostEstimatorRepo
 import com.test.querycostapp.repo.CostEstimatorRepo.handleSelection
 import com.test.querycostapp.repo.dataRepos.EmpMetaRepo
@@ -47,7 +49,7 @@ fun QueryScreen2() {
     var queryResult by rememberSaveable { mutableStateOf("") }
     var queryTokens = queryResult.split(Regex("\\s+")) // Tokenize by whitespace
 
-    var selectionCostList: MutableList<Pair<String, Double>> by rememberSaveable {
+    var selectionCostList: MutableList<Pair<String, Int>> by rememberSaveable {
         mutableStateOf(
             mutableListOf()
         )
@@ -144,7 +146,10 @@ fun QueryScreen2() {
                 item {
                     for ((label, cost) in selectionCostList) {
                         println("$label: $cost")
-                        Text(text = "$label: $cost")
+                        Row (modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                            Text(text = "$label:",style = TextStyle(fontSize = 16.sp,fontWeight = FontWeight.Bold))
+                            Text(text = "$cost", modifier = Modifier.padding(start = 10.dp))
+                        }
                     }
                 }
 
