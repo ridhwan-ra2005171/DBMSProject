@@ -274,8 +274,8 @@ object CostEstimatorRepo {
 
                 var blockCount = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.blockCount
                 var rowCount = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.rowCount
-                var empBfr = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.bfr
-                var x = indexMetadatas.firstOrNull { it.indexName.equals("ProjectNo", ignoreCase = true) }?.level //returns level of index
+                var projBfr = tableMetadatas.firstOrNull { it.tableName.equals("PROJECT", ignoreCase = true) }?.bfr
+                var x = indexMetadatas.firstOrNull { it.indexName.equals("Project_ProjectNo", ignoreCase = true) }?.level //returns level of index
 
 
                 // Check query type for Project table
@@ -297,20 +297,24 @@ object CostEstimatorRepo {
                     Log.d("primarykey2", "isFound ${isFound} ")
 
                     var costS1a = S1LinearSearch(notFound = isFound, unique = true, equality = true, blockCount = blockCount!!)
+                    Log.d("PKequality2", "costS1a:  ${costS1a} ")
+
 //                    S2a------
-                    var costS2a = S2BinarySearchCost(blockCount!!,1.0,empBfr!!) //S=1 since its unique [WORKING]
+                    var costS2a = S2BinarySearchCost(blockCount!!,1.0,projBfr!!) //S=1 since its unique [WORKING]
+                    Log.d("PKequality2", "costS2a:  ${costS2a} ")
 
                     //S3a------
                     var cost3a = S3aPrimaryKeySelectCost(x!!) //passes index level
+                    Log.d("PKequality2", "cost3a:  ${cost3a} ")
+
 //                    S3b------
                     var cost3b = S3bHashKeySelectCost() //[Working]
+                    Log.d("PKequality2", "cost3b:  ${cost3b} ")
+
 //                    S6a------
 //                    var costS6a = S6SecondaryIndexCost(rowCount!!,1.0,empBfr!!)
 
-                    Log.d("PKequality2", "costS1a:  ${costS1a} ")
-                    Log.d("PKequality2", "costS2a:  ${costS2a} ")
-                    Log.d("PKequality2", "cost3a:  ${cost3a} ")
-                    Log.d("PKequality2", "cost3b:  ${cost3b} ")
+
 
 
 
@@ -323,9 +327,32 @@ object CostEstimatorRepo {
 
 
 
-                } else if (writtenQuery.contains("ProjectName") && writtenQuery.contains("=")) {
+                } else if (!writtenQuery.contains("ProjectNo") && writtenQuery.contains("=")) {
                     // Non-Primary Key using Equality Operator
                     Log.d("queryType", "Non-Primary Key using Equality Operator")
+
+                    var selectedAttribute = writtenQuery[writtenQuery.indexOf("WHERE") + 1] //gets selected attribute
+                    var s = projectMetadatas.firstOrNull { it.ProjAttribute.equals(selectedAttribute, ignoreCase = true) }?.selectionCardinality //Selection Cardinality of attribute selected
+                    Log.d("NPK", "selectedAttribute:  ${selectedAttribute}")
+                    Log.d("NPK", "s: ${s}")
+                    var targetvalue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
+
+
+                    //S1b
+                    var isfound = valueExists(targetvalue, selectedAttribute, projects)
+                    var costS1b = S1LinearSearch(notFound = isfound, unique = false, equality = true, blockCount = blockCount!!)
+                    Log.d("NPKequality2", "costS1b:  ${costS1b} ")
+                    //S2b
+                    var costS2b = S2BinarySearchCost(blockCount!!,s!!,projBfr!!) // [WORKING]
+                    Log.d("NPKequality2", "costS2b:  ${costS2b} ")
+
+                    //S6ab secondary index on a non-key attribute with an equality condition
+                    var costS6ab = S6SecondaryIndexCost(x!!,false,false,s!!,projBfr!!)
+                    Log.d("NPKequality2", "costS6ab:  ${costS6ab} ")
+
+
+
+
 
 
 
