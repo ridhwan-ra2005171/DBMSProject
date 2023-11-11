@@ -18,7 +18,7 @@ SELECT * FROM PROJECT WHERE ProjectNo = 2;
 SELECT * FROM PROJECT WHERE ProjectNo BETWEEN 2 AND 4;
 
         //Non-Primary Key using Equality Operator:
-SELECT * FROM PROJECT WHERE ProjectName = 'Project B';
+SELECT * FROM PROJECT WHERE ProjectLoc = Downtown;
 
         //Non-Primary Key using Range Operator:
 SELECT * FROM PROJECT WHERE ManagedBy BETWEEN 'Manager 1' AND 'Manager 2';
@@ -36,3 +36,15 @@ Non-Primary Key using Equality Operator:
 S1b 
 S2b [working]
 S6ab (secondary index on a non-key attribute) [working]
+<<<<<<< Updated upstream
+=======
+
+//------------------------------
+PROJECTS
+
+Primary Key and Equality Operator:
+S1a [working] but check the isFound = true
+S2a [working]
+S3b [working]
+S6a (check this again)
+>>>>>>> Stashed changes
