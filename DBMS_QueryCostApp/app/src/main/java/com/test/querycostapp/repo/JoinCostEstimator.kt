@@ -27,6 +27,7 @@ object JoinCostEstimator {
         val R = innerTable.rowCount
         val S = outerTable.rowCount
         val bfrRS = outerTable.bfr
+        val xB = 1
         val nB = noOfBuffers
 
         val sB = empMetadata.find { it.EmpAttribute.equals("SSN", ignoreCase = true) }?.selectionCardinality!!
@@ -49,6 +50,16 @@ object JoinCostEstimator {
             hasPrimaryIndex = checkIfIndexExists("Employee_SSN", "Primary", indexMetadata)
         }
 
+        // checking if sorting is needed for J3
+        var outerSorted = false // default, also if its project it should be false
+        var innerSorted = false // default, also if its project it should be false
+        if(outerTable.tableName.equals("Employee", ignoreCase = true) && checkIfIndexExists("Employee_SSN", "Primary", indexMetadata)){
+            outerSorted = true
+        }
+        if(innerTable.tableName.equals("Employee", ignoreCase = true) && checkIfIndexExists("Employee_SSN", "Primary", indexMetadata)){
+            innerSorted = true
+        }
+
 //        var hasHashIndex = checkIfIndexExists("Project_managedBy", "Hash", indexMetadata)
 //        if (innerTable.tableName.equals("Employee", ignoreCase = true)) {
 //            hasHashIndex = checkIfIndexExists("Employee_SSN", "Hash", indexMetadata)
@@ -59,14 +70,14 @@ object JoinCostEstimator {
 
         // J2 - Index Based join
         val CJ2 = joinAlgorithms.J2IndexBasedJoinCost(
-            js, bR, R, S, nB, sB, bfrRS,
+            js, bR, R, S, xB, sB, bfrRS,
             hasSecondaryIndex, hasClusterIndex, hasPrimaryIndex,
             innerTableHasHash = innerTableHasHash )
         // Storing the cost of each join in an object each (deconstructing the CJ2 list)
         val (CJ2a, CJ2b, CJ2c, CJ2d) = CJ2.values.toList()
 
         // J3 - Sort-merge join
-        val CJ3 = joinAlgorithms.J3SortMergeJoinCost(bR, bS, js, R, S, bfrRS, false) //figure out sorting needed
+        val CJ3 = joinAlgorithms.J3SortMergeJoinCost(bR, bS, js, R, S, bfrRS, outerSorted,innerSorted) //figure out sorting needed
 
         // J4 - Partition-hash join
         val CJ4 = joinAlgorithms.J4PartitionHashJoinCost(bR, bS, js, R, S, bfrRS)
