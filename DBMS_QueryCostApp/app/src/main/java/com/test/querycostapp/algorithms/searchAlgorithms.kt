@@ -70,7 +70,7 @@ object searchAlgorithms{
     //for secondary on nonkey attribute, cost is CS6a = x + 1 + s [s is selection cardinality]
     //S6b -> for range queries The cost estimate for this case, approximately, is CS6b = x + (bI1/2) + (r/2) [bI1 is the number of blocks in the index, r is the number of records in the index]
 
-    fun S6SecondaryIndexCost(x: Double, isUniqueKeyAttribute: Boolean, isRangeQuery: Boolean, s: Double = 0.0, bI1: Int = 0, r: Int = 0): Double {
+    fun S6SecondaryIndexCost(x: Int, isUniqueKeyAttribute: Boolean, isRangeQuery: Boolean, s: Double = 0.0, bI1: Int = 0, r: Int = 0): Double {
         return if (!isRangeQuery) {
             if (isUniqueKeyAttribute) {
                 // S6a -> For a secondary index on a unique key attribute with an equality condition
@@ -126,15 +126,15 @@ fun main(args: Array<String>) {
 
     //S6 - Secondary Index Cost--------------------
     // Example usage for a secondary index on a unique key attribute with an equality condition
-    val S6cost1 = S6SecondaryIndexCost(5.0, isUniqueKeyAttribute = true, isRangeQuery = false)
+    val S6cost1 = S6SecondaryIndexCost(5, isUniqueKeyAttribute = true, isRangeQuery = false)
     println("Cost S6a: $cost1")
 
     // Example usage for a secondary index on a unique key attribute with a range query
-    val S6cost2 = S6SecondaryIndexCost(5.0, isUniqueKeyAttribute = true, isRangeQuery = true, bI1 = 100, r = 500)
+    val S6cost2 = S6SecondaryIndexCost(5, isUniqueKeyAttribute = true, isRangeQuery = true, bI1 = 100, r = 500)
     println("Cost S6b: $S6cost2")
 
     // Example usage for a secondary index on a non-key attribute with an equality condition
-    val S6cost3 = S6SecondaryIndexCost(5.0, isUniqueKeyAttribute = false, isRangeQuery = false, s = 50.0)
+    val S6cost3 = S6SecondaryIndexCost(5, isUniqueKeyAttribute = false, isRangeQuery = false, s = 50.0)
     println("Cost S6a nonkey: $S6cost3")
 
 }

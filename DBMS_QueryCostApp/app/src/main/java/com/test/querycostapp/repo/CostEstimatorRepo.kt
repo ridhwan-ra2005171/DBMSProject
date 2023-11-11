@@ -216,7 +216,8 @@ object CostEstimatorRepo {
                     Log.d("primarykey", "blockCount ${blockCount} ")
 //                    Log.d("primarykey", "primaryKeyValue ${primaryKeyValue} ")
 //                    S1a-----
-//                    S1LinearSearch(notFound = false, unique = true, equality = true, blockCount = 2000)
+                    var isFound = valueExists(primaryKey, "SSN", employees)
+                    var costS1a = S1LinearSearch(notFound = isFound, unique = true, equality = true, blockCount = blockCount!!)
 //                    S2a------
                     var costS2a = S2BinarySearchCost(blockCount!!,1.0,empBfr!!) //S=1 since its unique [WORKING]
 
@@ -227,6 +228,7 @@ object CostEstimatorRepo {
 //                    S6a------
 //                    var costS6a = S6SecondaryIndexCost(rowCount!!,1.0,empBfr!!)
 
+                    Log.d("PKequality", "costS1a:  ${costS1a} ")
                     Log.d("PKequality", "costS2a:  ${costS2a} ")
                     Log.d("PKequality", "cost3a:  ${cost3a} ")
                     Log.d("PKequality", "cost3b:  ${cost3b} ")
@@ -236,9 +238,28 @@ object CostEstimatorRepo {
                 } else if (writtenQuery.contains(">=") || writtenQuery.contains("<=")|| writtenQuery.contains("<")|| writtenQuery.contains(">")) {
                     // Range Operator
                     Log.d("queryType", "Range Operator")
-                } else if (writtenQuery.contains("Fname") || writtenQuery.contains("Lname") && writtenQuery.contains("=")) {
+                } else if (!writtenQuery.contains("SSN") && writtenQuery.contains("=")) { //if doesnt contain primary (meaning uses non-primary key)
                     // Non-Primary Key using Equality Operator
                     Log.d("queryType", "Non-Primary Key using Equality Operator")
+                    var selectedAttribute = writtenQuery[writtenQuery.indexOf("WHERE") + 1] //gets selected attribute
+                    var s = empMetadatas.firstOrNull { it.EmpAttribute.equals(selectedAttribute, ignoreCase = true) }?.selectionCardinality //Selection Cardinality of attribute selected
+                    Log.d("NPK", "selectedAttribute:  ${selectedAttribute}")
+                    Log.d("NPK", "s: ${s}")
+
+
+                    //S1b
+
+                    //S2b
+                    var costS2b = S2BinarySearchCost(blockCount!!,s!!,empBfr!!) // [WORKING]
+
+
+                    //S6ab secondary index on a non-key attribute with an equality condition
+                    var costS6ab = S6SecondaryIndexCost(x!!,false,false,s!!,empBfr!!)
+
+
+                    Log.d("NPKequality", "costS2b:  ${costS2b} ")
+                    Log.d("NPKequality", "costS6ab:  ${costS6ab} ")
+
                 } else if (writtenQuery.contains("HireDate") && writtenQuery.contains(">=") || writtenQuery.contains("<=") || writtenQuery.contains("<")|| writtenQuery.contains(">")) {
                     // Non-Primary Key using Range Operator
                     Log.d("queryType", "Non-Primary Key using Range Operator")
@@ -398,32 +419,5 @@ object CostEstimatorRepo {
         return -1 // Employee not found
     }
 
-
-
-
-    //for S6 there are 4 scenarios
-
-
-//    J3 sortmerge:
-//    Br + Bs +((joinselectivity * |R| * |S|)/bfr of RS
-
 }
 
-
-//
-//
-//            Log.d("query", "${writtenQuery[7]} ")
-//            Log.d("query", "${employees[0].SSN} ")
-//
-//            //just testing via hardcoding (press the button) [binary search working]
-//            Log.d("S2", "${writtenQuery[7]}")
-//            val (index) = binarySearchEmployee(
-//                employees,
-//                writtenQuery[7]
-//            )
-//            if (index != -1) { //if employee is found
-//                val employee = employees[index]
-//                Log.d("S2", "${employee}")
-//            } else {
-//                Log.d("S2", "Employee with SSN ${writtenQuery[7]} not found")
-//            }

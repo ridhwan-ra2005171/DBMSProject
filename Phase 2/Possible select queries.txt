@@ -26,7 +26,13 @@ SELECT * FROM PROJECT WHERE ManagedBy BETWEEN 'Manager 1' AND 'Manager 2';
 
 //--------------------------------
 Primary Key and Equality Operator:
-S1a
-S2a
-S3b
-S6a
+S1a [working]
+S2a [working]
+S3b [working]
+S6a (check this again)
+
+
+Non-Primary Key using Equality Operator:
+S1b 
+S2b [working]
+S6ab (secondary index on a non-key attribute) [working]
