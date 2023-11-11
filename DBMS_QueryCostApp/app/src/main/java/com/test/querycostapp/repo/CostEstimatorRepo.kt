@@ -195,9 +195,47 @@ object CostEstimatorRepo {
             if(tableName.equals("Employee", ignoreCase = true)){ //handles employee table
                 Log.d("tablename", "Table Name: $tableName")
 
+                // Check query type for Employee table
+                if (writtenQuery.contains("SSN") && writtenQuery.contains("=")) {
+                    // Primary Key and Equality Operator
+                    Log.d("queryType", "Primary Key and Equality Operator")
+                    var primaryKey = writtenQuery[writtenQuery.indexOf("SSN")] //position of primary key
+                    var primaryKeyValue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
+
+                    Log.d("primarykey", "primaryKey ${primaryKey} ")
+//                    Log.d("primarykey", "primaryKeyValue ${primaryKeyValue} ")
+
+
+                } else if (writtenQuery.contains(">=") || writtenQuery.contains("<=")|| writtenQuery.contains("<")|| writtenQuery.contains(">")) {
+                    // Range Operator
+                    Log.d("queryType", "Range Operator")
+                } else if (writtenQuery.contains("Fname") || writtenQuery.contains("Lname") && writtenQuery.contains("=")) {
+                    // Non-Primary Key using Equality Operator
+                    Log.d("queryType", "Non-Primary Key using Equality Operator")
+                } else if (writtenQuery.contains("HireDate") && writtenQuery.contains(">=") || writtenQuery.contains("<=") || writtenQuery.contains("<")|| writtenQuery.contains(">")) {
+                    // Non-Primary Key using Range Operator
+                    Log.d("queryType", "Non-Primary Key using Range Operator")
+                }
+
+
             }else if(tableName.equals("Project", ignoreCase = true)){ //handles project table
                 Log.d("tablename", "Table Name: $tableName")
 
+
+                // Check query type for Project table
+                if (writtenQuery.contains("ProjectNo") && writtenQuery.contains("=")) {
+                    // Primary Key and Equality Operator
+                    Log.d("queryType", "Primary Key and Equality Operator")
+                } else if (writtenQuery.contains("ProjectNo") && writtenQuery.contains("BETWEEN")) {
+                    // Range Operator
+                    Log.d("queryType", "Range Operator")
+                } else if (writtenQuery.contains("ProjectName") && writtenQuery.contains("=")) {
+                    // Non-Primary Key using Equality Operator
+                    Log.d("queryType", "Non-Primary Key using Equality Operator")
+                } else if (writtenQuery.contains("ManagedBy") && writtenQuery.contains("BETWEEN")) {
+                    // Non-Primary Key using Range Operator
+                    Log.d("queryType", "Non-Primary Key using Range Operator")
+                }
             }
 
         }
