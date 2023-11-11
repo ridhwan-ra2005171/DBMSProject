@@ -42,6 +42,11 @@ object searchAlgorithms{
         }
     }
 
+    //S3a CS3a = x + 1.0, x is levels of index
+    fun S3aPrimaryKeySelectCost(x: Int): Int{
+        return x + 1
+    }
+
     fun S3bHashKeySelectCost(): Double{
         return 1.0
     }

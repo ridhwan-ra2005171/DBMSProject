@@ -3,6 +3,7 @@ package com.test.querycostapp.repo
 import android.util.Log
 import com.test.querycostapp.algorithms.searchAlgorithms.S1LinearSearch
 import com.test.querycostapp.algorithms.searchAlgorithms.S2BinarySearchCost
+import com.test.querycostapp.algorithms.searchAlgorithms.S3aPrimaryKeySelectCost
 import com.test.querycostapp.algorithms.searchAlgorithms.S3bHashKeySelectCost
 import com.test.querycostapp.algorithms.searchAlgorithms.S6SecondaryIndexCost
 import com.test.querycostapp.model.Employee
@@ -201,6 +202,7 @@ object CostEstimatorRepo {
                 var blockCount = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.blockCount
                 var rowCount = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.rowCount
                 var empBfr = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.bfr
+                var x = indexMetadatas.firstOrNull { it.indexName.equals("Employee_SSN", ignoreCase = true) }?.level //returns level of index
 
                 // Check query type for Employee table
                 if (writtenQuery.contains("SSN") && writtenQuery.contains("=")) {
@@ -218,13 +220,17 @@ object CostEstimatorRepo {
 //                    S2a------
                     var costS2a = S2BinarySearchCost(blockCount!!,1.0,empBfr!!) //S=1 since its unique [WORKING]
 
+                    //S3a------
+                    var cost3a = S3aPrimaryKeySelectCost(x!!) //passes index level
 //                    S3b------
                     var cost3b = S3bHashKeySelectCost() //[Working]
 //                    S6a------
 //                    var costS6a = S6SecondaryIndexCost(rowCount!!,1.0,empBfr!!)
 
                     Log.d("PKequality", "costS2a:  ${costS2a} ")
-                    Log.d("PKequality", "cost3b:  ${costS2a} ")
+                    Log.d("PKequality", "cost3a:  ${cost3a} ")
+                    Log.d("PKequality", "cost3b:  ${cost3b} ")
+
 
 
                 } else if (writtenQuery.contains(">=") || writtenQuery.contains("<=")|| writtenQuery.contains("<")|| writtenQuery.contains(">")) {
