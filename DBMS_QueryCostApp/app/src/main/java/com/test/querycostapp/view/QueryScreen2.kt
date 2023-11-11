@@ -8,11 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -32,14 +30,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.test.querycostapp.repo.CostEstimatorRepo
-import com.test.querycostapp.repo.CostEstimatorRepo.handleQuery
+import com.test.querycostapp.repo.CostEstimatorRepo.handleSelection
 import com.test.querycostapp.repo.dataRepos.EmpMetaRepo
 import com.test.querycostapp.repo.dataRepos.EmployeeRepo
 import com.test.querycostapp.repo.dataRepos.IndexMetaRepo
 import com.test.querycostapp.repo.dataRepos.ProjMetaRepo
 import com.test.querycostapp.repo.dataRepos.ProjectRepo
 import com.test.querycostapp.repo.dataRepos.TablesMetaRepo
-import com.test.querycostapp.view.CostItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +46,14 @@ fun QueryScreen2() {
     var queryText by rememberSaveable { mutableStateOf("") }
     var queryResult by rememberSaveable { mutableStateOf("") }
     var queryTokens = queryResult.split(Regex("\\s+")) // Tokenize by whitespace
+
+    var selectionCostList: MutableList<Pair<String, Double>> by rememberSaveable {
+        mutableStateOf(
+            mutableListOf()
+        )
+    }
+
+
 
     CostEstimatorRepo.employees = EmployeeRepo.initEmployees(LocalContext.current).toMutableList()
     CostEstimatorRepo.projects = ProjectRepo.initProjects(LocalContext.current).toMutableList()
@@ -96,7 +101,7 @@ fun QueryScreen2() {
             onClick = {
                 // When the button is pressed, update queryResult
                 queryResult = queryText;
-                handleQuery();
+                selectionCostList=handleSelection();
                 showCosts = !showCosts //toggle the showCosts
             }
         ) {
@@ -136,10 +141,23 @@ fun QueryScreen2() {
 //                    )
 //
 //                }
+                item {
+                    for ((label, cost) in selectionCostList) {
+                        println("$label: $cost")
+                        Text(text = "$label: $cost")
+                    }
+                }
+
+
             }
         }
     }
 }
+
+
+
+// Usage in your composable function
+
 
 
 

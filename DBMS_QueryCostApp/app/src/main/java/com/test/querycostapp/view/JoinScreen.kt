@@ -172,7 +172,7 @@ fun JoinScreen() {
                                     .show()
                             } else {
                                 // Here we call the Join Cost Estimator
-                                costList = CostEstimatorRepo.handleJoin(
+                                 costList = CostEstimatorRepo.handleJoin(
                                     selectedOuterTable = outerTable,
                                     selectedInnerTable = innerTable,
                                     selectedNoOfBuffers = bufferNo,
