@@ -214,10 +214,10 @@ object CostEstimatorRepo {
 
                     Log.d("primarykey", "primaryKey ${primaryKey} ")
                     Log.d("primarykey", "blockCount ${blockCount} ")
-//                    Log.d("primarykey", "primaryKeyValue ${primaryKeyValue} ")
+                    Log.d("primarykey", "primaryKeyValue ${targetvalue} ")
 //                    S1a-----
                     var isFound = valueExists(targetvalue, "SSN", employees)
-                    var costS1a = S1LinearSearch(notFound = isFound, unique = true, equality = true, blockCount = blockCount!!)
+                    var costS1a = S1LinearSearch(notFound = !isFound, unique = true, equality = true, blockCount = blockCount!!)
 //                    S2a------
                     var costS2a = S2BinarySearchCost(blockCount!!,1.0,empBfr!!) //S=1 since its unique [WORKING]
 
@@ -250,7 +250,7 @@ object CostEstimatorRepo {
 
                     //S1b
                     var isfound = valueExists(targetvalue, selectedAttribute, employees)
-                    var costS1b = S1LinearSearch(notFound = false, unique = false, equality = true, blockCount = blockCount!!)
+                    var costS1b = S1LinearSearch(notFound = !isfound, unique = false, equality = true, blockCount = blockCount!!)
 
                     //S2b
                     var costS2b = S2BinarySearchCost(blockCount!!,s!!,empBfr!!) // [WORKING]
@@ -296,7 +296,7 @@ object CostEstimatorRepo {
                     var isFound = valueExists(targetvalue, "ProjectNo", projects)
                     Log.d("primarykey2", "isFound ${isFound} ")
 
-                    var costS1a = S1LinearSearch(notFound = isFound, unique = true, equality = true, blockCount = blockCount!!)
+                    var costS1a = S1LinearSearch(notFound = !isFound, unique = true, equality = true, blockCount = blockCount!!)
                     Log.d("PKequality2", "costS1a:  ${costS1a} ")
 
 //                    S2a------
@@ -340,7 +340,7 @@ object CostEstimatorRepo {
 
                     //S1b
                     var isfound = valueExists(targetvalue, selectedAttribute, projects)
-                    var costS1b = S1LinearSearch(notFound = isfound, unique = false, equality = true, blockCount = blockCount!!)
+                    var costS1b = S1LinearSearch(notFound = !isfound, unique = false, equality = true, blockCount = blockCount!!)
                     Log.d("NPKequality2", "costS1b:  ${costS1b} ")
                     //S2b
                     var costS2b = S2BinarySearchCost(blockCount!!,s!!,projBfr!!) // [WORKING]
