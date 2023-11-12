@@ -55,6 +55,7 @@ fun QueryScreen2() {
         )
     }
 
+    selectionCostList.sortBy { it.second } //sort ascending by the second element (cost)
 
 
     CostEstimatorRepo.employees = EmployeeRepo.initEmployees(LocalContext.current).toMutableList()
