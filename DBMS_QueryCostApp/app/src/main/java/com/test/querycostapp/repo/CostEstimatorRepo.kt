@@ -240,11 +240,11 @@ object CostEstimatorRepo {
                     Log.d("PKequality", "cost3b:  ${cost3b} ")
                     Log.d("PKequality", "costS6a:  ${costS6a} ")
 
-                    selectcostList.add("costS1a" to costS1a.toInt())
-                    selectcostList.add("costS2a" to costS2a.toInt())
-                    selectcostList.add("cost3a" to cost3a)
+                    selectcostList.add("S1 - Linear Search on unique Select" to costS1a.toInt())
+                    selectcostList.add("S2a - Binary Search on Unique Select" to costS2a.toInt())
+                    selectcostList.add("S3a - PrimaryKey index Select" to cost3a)
 //                    selectcostList.add("cost3b" to cost3b.toInt())
-                    selectcostList.add("costS6a" to costS6a.toInt())
+                    selectcostList.add("S6a - Secondary Index on Unique Select" to costS6a.toInt())
 
 
 
@@ -296,9 +296,9 @@ object CostEstimatorRepo {
                     Log.d("NPKequality", "costS2b:  ${costS2b} ")
                     Log.d("NPKequality", "costS6a Nonkey:  ${costS6ab} ")
 
-                    selectcostList.add("costS1b" to costS1b.toInt())
-                    selectcostList.add("costS2b" to costS2b.toInt())
-                    selectcostList.add("costS6ab" to costS6ab.toInt())
+                    selectcostList.add("S1b - Linear Search on non-primary Select" to costS1b.toInt())
+                    selectcostList.add("S2b - Binary Search on non-primary Select" to costS2b.toInt())
+                    selectcostList.add("S6ab - Secondary Index on non-primary Select" to costS6ab.toInt())
 
                     return selectcostList
 
