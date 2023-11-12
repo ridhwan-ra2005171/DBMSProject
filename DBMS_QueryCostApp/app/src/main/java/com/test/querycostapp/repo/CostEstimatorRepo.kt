@@ -447,16 +447,18 @@ object CostEstimatorRepo {
                 } else if (writtenQuery.contains("ManagedBy") && (writtenQuery.contains(">=") || writtenQuery.contains("<=") || writtenQuery.contains("<")|| writtenQuery.contains(">"))) {
                     // Non-Primary Key using Range Operator
                     Log.d("queryType", "Non-Primary Key using Range Operator")
+                    var bFirst = indexMetadatas.firstOrNull { it.indexName.equals("Project_managedBy", ignoreCase = true) }?.firstLevelBlockCount //first level block count of index
 
                     // S1 and S6b
 
-                        var targetvalue = writtenQuery[writtenQuery.indexOf("ManagedBy") + 2] //value of to be compared to
-                        var isFound = valueExists(targetvalue, "ManagedBy", employees)
+                    var targetvalue = writtenQuery[writtenQuery.indexOf("ManagedBy") + 2] //value of to be compared to
+                    var isFound = valueExists(targetvalue, "ManagedBy", employees)
 
-                        var costS1c = ceil(S1LinearSearch(notFound = !isFound, unique = false, equality = false, blockCount = blockCount!!)).toInt()
-                        // var costS6b = S6SecondaryIndexCost(x!!,false,true,bI1 = first level block count,r = no of records)
+                    var costS1c = ceil(S1LinearSearch(notFound = !isFound, unique = false, equality = false, blockCount = blockCount!!)).toInt()
+                    var costS6b = ceil(S6SecondaryIndexCost(x!!,false,true,bI1 = bFirst!! ,r = rowCount!!)).toInt()
 
-                        selectcostList.add("CS1c - Linear Search" to costS1c)
+                    selectcostList.add("CS1c - Linear Search" to costS1c)
+                    selectcostList.add("CS6b - Secondary Index on Non-Primary Range" to costS6b)
 
                     return selectcostList
 
