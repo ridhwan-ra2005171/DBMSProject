@@ -5,6 +5,7 @@ import com.test.querycostapp.algorithms.searchAlgorithms.S1LinearSearch
 import com.test.querycostapp.algorithms.searchAlgorithms.S2BinarySearchCost
 import com.test.querycostapp.algorithms.searchAlgorithms.S3aPrimaryKeySelectCost
 import com.test.querycostapp.algorithms.searchAlgorithms.S3bHashKeySelectCost
+import com.test.querycostapp.algorithms.searchAlgorithms.S4IndexForMultipleRecords
 import com.test.querycostapp.algorithms.searchAlgorithms.S6SecondaryIndexCost
 import com.test.querycostapp.model.Employee
 import com.test.querycostapp.model.EmployeeMetadata
@@ -13,6 +14,7 @@ import com.test.querycostapp.model.Project
 import com.test.querycostapp.model.ProjectMetadata
 import com.test.querycostapp.model.TablesMetadata
 import com.test.querycostapp.model.tableTypesClasses.TableClass
+import kotlin.math.ceil
 
 // This method searches if the value of the attribute entered exists in the table
 // like if SSN = 123 is in the Employee table, it will return TRUE
@@ -248,14 +250,32 @@ object CostEstimatorRepo {
 
                     return selectcostList
 
-                } else if (writtenQuery.contains(">=") || writtenQuery.contains("<=")|| writtenQuery.contains("<")|| writtenQuery.contains(">")) {
+                } else if (writtenQuery.contains("SSN") && (writtenQuery.contains(">=") || writtenQuery.contains("<=")|| writtenQuery.contains("<")|| writtenQuery.contains(">"))) {
                     // Range Operator using primary
+                    // S1 and S4
                     Log.d("queryType", "Range Operator")
+
+                    var targetvalue = writtenQuery[writtenQuery.indexOf("SSN") + 2] //value of primary key
+                    var isFound = valueExists(targetvalue, "SSN", employees)
+
+                    var costS1c = ceil(S1LinearSearch(notFound = !isFound, unique = true, equality = false, blockCount = blockCount!!)).toInt()
+
+                    var costS4 = ceil(S4IndexForMultipleRecords(indexLevel = x!!, blockCount = blockCount)).toInt()
+
+                    Log.d("PKrange", "costS1c:  ${costS1c} ")
+                    Log.d("PKrange", "costS4:  ${costS4} ")
+
+                    selectcostList.add("CS1c - Linear Search" to costS1c)
+                    selectcostList.add("CS4 - Ordering-Index for multiple Records" to costS4)
+
+                    return selectcostList
+
                 } else if (!writtenQuery.contains("SSN") && writtenQuery.contains("=")) { //if doesnt contain primary (meaning uses non-primary key)
                     // Non-Primary Key using Equality Operator
                     Log.d("queryType", "Non-Primary Key using Equality Operator")
                     var selectedAttribute = writtenQuery[writtenQuery.indexOf("WHERE") + 1] //gets selected attribute
                     var s = empMetadatas.firstOrNull { it.EmpAttribute.equals(selectedAttribute, ignoreCase = true) }?.selectionCardinality //Selection Cardinality of attribute selected
+                    var bFirst = indexMetadatas.firstOrNull { it.indexName.equals("Employee_managerSSN", ignoreCase = true) }?.firstLevelBlockCount //first level block count of index
                     Log.d("NPK", "selectedAttribute:  ${selectedAttribute}")
                     Log.d("NPK", "s: ${s}")
                     var targetvalue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
@@ -270,7 +290,7 @@ object CostEstimatorRepo {
 
 
                     //S6ab secondary index on a non-key attribute with an equality condition
-                    var costS6ab = S6SecondaryIndexCost(x!!,false,false,s!!,empBfr!!)
+                    var costS6ab = S6SecondaryIndexCost(x!!,false,false,s!!,bFirst!!)
 
                     Log.d("NPKequality", "costS1b:  ${costS1b} ")
                     Log.d("NPKequality", "costS2b:  ${costS2b} ")
@@ -283,9 +303,34 @@ object CostEstimatorRepo {
                     return selectcostList
 
 
-                } else if (writtenQuery.contains("HireDate") && writtenQuery.contains(">=") || writtenQuery.contains("<=") || writtenQuery.contains("<")|| writtenQuery.contains(">")) {
+                } else if ((writtenQuery.contains("HireDate") || writtenQuery.contains("DOB")) && (writtenQuery.contains(">=") || writtenQuery.contains("<=") || writtenQuery.contains("<")|| writtenQuery.contains(">"))) {
                     // Non-Primary Key using Range Operator
                     Log.d("queryType", "Non-Primary Key using Range Operator")
+                    // S1 and S6b
+                    var isHireDate = false // the attribute is DOB
+                    if (writtenQuery.contains("HireDate")){
+                        isHireDate = true // the attribute is Hire Date
+                    }
+
+                    if (isHireDate){
+                        var targetvalue = writtenQuery[writtenQuery.indexOf("HireDate") + 2] //value of to be compared to
+                        var isFound = valueExists(targetvalue, "HireDate", employees)
+
+                        var costS1c = ceil(S1LinearSearch(notFound = !isFound, unique = false, equality = false, blockCount = blockCount!!)).toInt()
+                        // var costS6b = S6SecondaryIndexCost(x!!,false,true,bI1 = first level block count,r = no of records)
+
+                        selectcostList.add("CS1c - Linear Search" to costS1c)
+                    }else{
+                        var targetvalue = writtenQuery[writtenQuery.indexOf("DOB") + 2] //value of to be compared to
+                        var isFound = valueExists(targetvalue, "DOB", employees)
+
+                        var costS1c = ceil(S1LinearSearch(notFound = !isFound, unique = false, equality = false, blockCount = blockCount!!)).toInt()
+
+                        selectcostList.add("CS1c - Linear Search" to costS1c)
+                    }
+
+                    return selectcostList
+
                 }
 
 
@@ -348,12 +393,25 @@ object CostEstimatorRepo {
 
 
 
-                } else if (writtenQuery.contains("ProjectNo") && writtenQuery.contains("BETWEEN")) {
-                    // Range Operator
+                } else if (writtenQuery.contains("ProjectNo") && (writtenQuery.contains(">=") || writtenQuery.contains("<=") || writtenQuery.contains("<")|| writtenQuery.contains(">"))) {
+                    // Range Operator with primary index
+                    Log.d("queryType", "Range Operator")
                     Log.d("queryType", "Range Operator")
 
+                    var targetvalue = writtenQuery[writtenQuery.indexOf("ProjectNo") + 2] //value of primary key
+                    var isFound = valueExists(targetvalue, "ProjectNo", projects)
 
+                    var costS1c = ceil(S1LinearSearch(notFound = !isFound, unique = true, equality = false, blockCount = blockCount!!)).toInt()
 
+                    var costS4 = ceil(S4IndexForMultipleRecords(indexLevel = x!!, blockCount = blockCount)).toInt()
+
+                    Log.d("PKrange", "costS1c:  ${costS1c} ")
+                    Log.d("PKrange", "costS4:  ${costS4} ")
+
+                    selectcostList.add("CS1c - Linear Search" to costS1c)
+                    selectcostList.add("CS4 - Ordering-Index for multiple Records" to costS4)
+
+                    return selectcostList
 
                 } else if (!writtenQuery.contains("ProjectNo") && writtenQuery.contains("=")) {
                     // Non-Primary Key using Equality Operator
@@ -361,6 +419,7 @@ object CostEstimatorRepo {
 
                     var selectedAttribute = writtenQuery[writtenQuery.indexOf("WHERE") + 1] //gets selected attribute
                     var s = projectMetadatas.firstOrNull { it.ProjAttribute.equals(selectedAttribute, ignoreCase = true) }?.selectionCardinality //Selection Cardinality of attribute selected
+                    var bFirst = indexMetadatas.firstOrNull { it.indexName.equals("Project_managedBy", ignoreCase = true) }?.firstLevelBlockCount //first level block count of index
                     Log.d("NPK", "selectedAttribute:  ${selectedAttribute}")
                     Log.d("NPK", "s: ${s}")
                     var targetvalue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
@@ -375,7 +434,7 @@ object CostEstimatorRepo {
                     Log.d("NPKequality2", "costS2b:  ${costS2b} ")
 
                     //S6ab secondary index on a non-key attribute with an equality condition
-                    var costS6ab = S6SecondaryIndexCost(x!!,false,false,s!!,projBfr!!)
+                    var costS6ab = S6SecondaryIndexCost(x!!,false,false,s!!,bFirst!!)
                     Log.d("NPKequality2", "costS6a nonkey:  ${costS6ab} ")
 
 
@@ -385,15 +444,21 @@ object CostEstimatorRepo {
 
                     return selectcostList
 
-
-
-
-
-                } else if (writtenQuery.contains("ManagedBy") && writtenQuery.contains("BETWEEN")) {
+                } else if (writtenQuery.contains("ManagedBy") && (writtenQuery.contains(">=") || writtenQuery.contains("<=") || writtenQuery.contains("<")|| writtenQuery.contains(">"))) {
                     // Non-Primary Key using Range Operator
                     Log.d("queryType", "Non-Primary Key using Range Operator")
 
+                    // S1 and S6b
 
+                        var targetvalue = writtenQuery[writtenQuery.indexOf("ManagedBy") + 2] //value of to be compared to
+                        var isFound = valueExists(targetvalue, "ManagedBy", employees)
+
+                        var costS1c = ceil(S1LinearSearch(notFound = !isFound, unique = false, equality = false, blockCount = blockCount!!)).toInt()
+                        // var costS6b = S6SecondaryIndexCost(x!!,false,true,bI1 = first level block count,r = no of records)
+
+                        selectcostList.add("CS1c - Linear Search" to costS1c)
+
+                    return selectcostList
 
 
                 }

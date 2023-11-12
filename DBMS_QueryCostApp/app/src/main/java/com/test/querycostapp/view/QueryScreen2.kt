@@ -103,7 +103,7 @@ fun QueryScreen2() {
             onClick = {
                 // When the button is pressed, update queryResult
                 queryResult = queryText;
-                selectionCostList=handleSelection();
+                selectionCostList= handleSelection().sortedBy { it.second }.toMutableList();
                 showCosts = !showCosts //toggle the showCosts
             }
         ) {
