@@ -240,11 +240,11 @@ object CostEstimatorRepo {
                     Log.d("PKequality", "cost3b:  ${cost3b} ")
                     Log.d("PKequality", "costS6a:  ${costS6a} ")
 
-                    selectcostList.add("S1 - Linear Search on unique Select" to costS1a.toInt())
-                    selectcostList.add("S2a - Binary Search on Unique Select" to costS2a.toInt())
+                    selectcostList.add("S1 - Linear Search on unique Select" to costS1a )
+                    selectcostList.add("S2a - Binary Search on Unique Select" to costS2a )
                     selectcostList.add("S3a - PrimaryKey index Select" to cost3a)
-//                    selectcostList.add("cost3b" to cost3b.toInt())
-                    selectcostList.add("S6a - Secondary Index on Unique Select" to costS6a.toInt())
+//                    selectcostList.add("cost3b" to cost3b )
+                    selectcostList.add("S6a - Secondary Index on Unique Select" to costS6a )
 
 
 
@@ -258,9 +258,8 @@ object CostEstimatorRepo {
                     var targetvalue = writtenQuery[writtenQuery.indexOf("SSN") + 2] //value of primary key
                     var isFound = valueExists(targetvalue, "SSN", employees)
 
-                    var costS1c = ceil(S1LinearSearch(notFound = !isFound, unique = true, equality = false, blockCount = blockCount!!)).toInt()
-
-                    var costS4 = ceil(S4IndexForMultipleRecords(indexLevel = x!!, blockCount = blockCount)).toInt()
+                    var costS1c = S1LinearSearch(notFound = !isFound, unique = true, equality = false, blockCount = blockCount!!)
+                    var costS4 = S4IndexForMultipleRecords(indexLevel = x!!, blockCount = blockCount)
 
                     Log.d("PKrange", "costS1c:  ${costS1c} ")
                     Log.d("PKrange", "costS4:  ${costS4} ")
@@ -296,9 +295,9 @@ object CostEstimatorRepo {
                     Log.d("NPKequality", "costS2b:  ${costS2b} ")
                     Log.d("NPKequality", "costS6a Nonkey:  ${costS6ab} ")
 
-                    selectcostList.add("S1b - Linear Search on non-primary Select" to costS1b.toInt())
-                    selectcostList.add("S2b - Binary Search on non-primary Select" to costS2b.toInt())
-                    selectcostList.add("S6ab - Secondary Index on non-primary Select" to costS6ab.toInt())
+                    selectcostList.add("S1b - Linear Search on non-primary Select" to costS1b )
+                    selectcostList.add("S2b - Binary Search on non-primary Select" to costS2b )
+                    selectcostList.add("S6ab - Secondary Index on non-primary Select" to costS6ab )
 
                     return selectcostList
 
@@ -316,7 +315,7 @@ object CostEstimatorRepo {
                         var targetvalue = writtenQuery[writtenQuery.indexOf("HireDate") + 2] //value of to be compared to
                         var isFound = valueExists(targetvalue, "HireDate", employees)
 
-                        var costS1c = ceil(S1LinearSearch(notFound = !isFound, unique = false, equality = false, blockCount = blockCount!!)).toInt()
+                        var costS1c = S1LinearSearch(notFound = !isFound, unique = false, equality = false, blockCount = blockCount!!)
                         // var costS6b = S6SecondaryIndexCost(x!!,false,true,bI1 = first level block count,r = no of records)
 
                         selectcostList.add("CS1c - Linear Search" to costS1c)
@@ -324,7 +323,7 @@ object CostEstimatorRepo {
                         var targetvalue = writtenQuery[writtenQuery.indexOf("DOB") + 2] //value of to be compared to
                         var isFound = valueExists(targetvalue, "DOB", employees)
 
-                        var costS1c = ceil(S1LinearSearch(notFound = !isFound, unique = false, equality = false, blockCount = blockCount!!)).toInt()
+                        var costS1c = S1LinearSearch(notFound = !isFound, unique = false, equality = false, blockCount = blockCount!!)
 
                         selectcostList.add("CS1c - Linear Search" to costS1c)
                     }
@@ -382,11 +381,11 @@ object CostEstimatorRepo {
                     Log.d("PKequality2", "costS6a:  ${costS6a} ")
 
 
-                    selectcostList.add("S1b - Linear Search on unique Select" to costS1a.toInt())
-                    selectcostList.add("S2b - Binary Search on unique Select" to costS2a.toInt())
-                    selectcostList.add("S3a - PrimaryKey index Select" to cost3a.toInt())
-//                    selectcostList.add("costS6ab" to cost3b.toInt())
-                    selectcostList.add("S6ab - Secondary Index on unique Select" to costS6a.toInt())
+                    selectcostList.add("S1b - Linear Search on unique Select" to costS1a )
+                    selectcostList.add("S2b - Binary Search on unique Select" to costS2a )
+                    selectcostList.add("S3a - PrimaryKey index Select" to cost3a )
+//                    selectcostList.add("costS6ab" to cost3b )
+                    selectcostList.add("S6ab - Secondary Index on unique Select" to costS6a )
 
                     return selectcostList
 
@@ -401,9 +400,9 @@ object CostEstimatorRepo {
                     var targetvalue = writtenQuery[writtenQuery.indexOf("ProjectNo") + 2] //value of primary key
                     var isFound = valueExists(targetvalue, "ProjectNo", projects)
 
-                    var costS1c = ceil(S1LinearSearch(notFound = !isFound, unique = true, equality = false, blockCount = blockCount!!)).toInt()
+                    var costS1c = S1LinearSearch(notFound = !isFound, unique = true, equality = false, blockCount = blockCount!!)
 
-                    var costS4 = ceil(S4IndexForMultipleRecords(indexLevel = x!!, blockCount = blockCount)).toInt()
+                    var costS4 = S4IndexForMultipleRecords(indexLevel = x!!, blockCount = blockCount)
 
                     Log.d("PKrange", "costS1c:  ${costS1c} ")
                     Log.d("PKrange", "costS4:  ${costS4} ")
@@ -438,9 +437,9 @@ object CostEstimatorRepo {
                     Log.d("NPKequality2", "costS6a nonkey:  ${costS6ab} ")
 
 
-                    selectcostList.add("S1b - Linear Search on non-primary Select" to costS1b.toInt())
-                    selectcostList.add("S2b - Binary Search on non-primary Select" to costS2b.toInt())
-                    selectcostList.add("S6ab - Secondary Index on non-primary Select" to costS6ab.toInt())
+                    selectcostList.add("S1b - Linear Search on non-primary Select" to costS1b )
+                    selectcostList.add("S2b - Binary Search on non-primary Select" to costS2b )
+                    selectcostList.add("S6ab - Secondary Index on non-primary Select" to costS6ab )
 
                     return selectcostList
 
@@ -454,8 +453,8 @@ object CostEstimatorRepo {
                     var targetvalue = writtenQuery[writtenQuery.indexOf("ManagedBy") + 2] //value of to be compared to
                     var isFound = valueExists(targetvalue, "ManagedBy", employees)
 
-                    var costS1c = ceil(S1LinearSearch(notFound = !isFound, unique = false, equality = false, blockCount = blockCount!!)).toInt()
-                    var costS6b = ceil(S6SecondaryIndexCost(x!!,false,true,bI1 = bFirst!! ,r = rowCount!!)).toInt()
+                    var costS1c = S1LinearSearch(notFound = !isFound, unique = false, equality = false, blockCount = blockCount!!)
+                    var costS6b = S6SecondaryIndexCost(x!!,false,true,bI1 = bFirst!! ,r = rowCount!!)
 
                     selectcostList.add("CS1c - Linear Search" to costS1c)
                     selectcostList.add("CS6b - Secondary Index on Non-Primary Range" to costS6b)
@@ -497,7 +496,7 @@ object CostEstimatorRepo {
     }
 
 
-    fun handleJoin(selectedOuterTable : String, selectedInnerTable : String, selectedNoOfBuffers : Int, innerTableHasHash : Boolean): Map<String, Double> {
+    fun handleJoin(selectedOuterTable : String, selectedInnerTable : String, selectedNoOfBuffers : Int, innerTableHasHash : Boolean): Map<String,  Int> {
         // From table metadata ------------------------------------------------------------------------------------
         val empBfr = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.bfr
         val projBfr = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.bfr
@@ -565,7 +564,7 @@ object CostEstimatorRepo {
         return Costs
     }
 
-//    fun getJoinCost() : Map<String, Double> {
+//    fun getJoinCost() : Map<String,  Int> {
 //        JoinCostEstimator.getJoinCost()
 //    }
 
