@@ -613,7 +613,8 @@ object searchAlgorithms{
     // COST OF OR QUERY
     // Disjunction SELECT
     //return int and double from the function
-    fun S7DisjunctionSelectCost( conditionList : List<ConditionClass>, targetTable: TableClass, indexMetadata: List<IndexMetadata>, empMetadatas: List<EmployeeMetadata>, projectMetadatas: List<ProjectMetadata>) : Map<String, Int> {
+    fun S7DisjunctionSelectCost( conditionList : List<ConditionClass>, targetTable: TableClass, indexMetadata: List<IndexMetadata>, empMetadatas: List<EmployeeMetadata>, projectMetadatas: List<ProjectMetadata>) :
+            MutableList<Pair<String, Int>>  {
 
         var b : Int;
         var bfr : Int;
@@ -632,11 +633,13 @@ object searchAlgorithms{
 
         val allHaveIndex = conditionList.all { indexExists(it.attributeName) }
 
-        var costPerAttr : MutableMap<String, Int> = emptyMap<String, Int>().toMutableMap<String, Int>()
+        var costPerAttr: MutableList<Pair<String, Int>> = mutableListOf() //to store it for displaying
 
         // If any attribute in the query has NO index, return the brute force cost
         if (!allHaveIndex) {
-            return mapOf<String, Int>("S1 - Linear Search" to S1LinearSearch(true, false, false, if (targetTable.tableName.equals("Employee", ignoreCase = true)) 30 else 5))
+            costPerAttr.add("S1 - Linear Search" to
+                S1LinearSearch(true, false, false, if (targetTable.tableName.equals("Employee", ignoreCase = true)) 30 else 5))
+            return costPerAttr
         }
         // Equality:
         // S1(key, nonkey, S2(key, nonkey), S3a(key), S6a (key, nonkey)
@@ -686,7 +689,7 @@ object searchAlgorithms{
                         )
                     )
                     // add the least cost for this attribute in the costPerAttr map
-                    costPerAttr.put(keyCosts.minBy { it.value }.key, keyCosts.minBy { it.value }.value)
+                    costPerAttr.add(keyCosts.minBy { it.value }.key to  keyCosts.minBy { it.value }.value)
 
                 } else { // Non-Unique
                     val nonKeyCosts: MutableMap<String, Int> = mutableMapOf()
@@ -700,7 +703,7 @@ object searchAlgorithms{
                         searchAlgorithms.S6SecondaryIndexCost(x = x, isUniqueKeyAttribute = false, isRangeQuery = false, s = s, bI1 = bl1, r = r)
                     )
                     // add the least cost for this attribute in the costPerAttr map
-                    costPerAttr.put(nonKeyCosts.minBy { it.value }.key, nonKeyCosts.minBy { it.value }.value)
+                    costPerAttr.add(nonKeyCosts.minBy { it.value }.key to nonKeyCosts.minBy { it.value }.value)
                 }
                 // Range
                 // S1(key, nonkey), S4 (key), S6b (key, nonkey)
@@ -718,7 +721,7 @@ object searchAlgorithms{
                         searchAlgorithms.S6SecondaryIndexCost(x =x, isUniqueKeyAttribute = true, isRangeQuery = true, s = s!!, bI1 = bl1, r = r)
                     )
                     // add the least cost for this attribute in the costPerAttr map
-                    costPerAttr.put("${keyCosts.minBy { it.value }!!.key}", keyCosts.minBy { it.value }!!.value)
+                    costPerAttr.add("${keyCosts.minBy { it.value }!!.key}" to keyCosts.minBy { it.value }!!.value)
 
                 } else { // Non-Unique S1, S6b
                     val nonKeyCosts: MutableMap<String, Int> = mutableMapOf()
@@ -728,12 +731,20 @@ object searchAlgorithms{
                         searchAlgorithms.S6SecondaryIndexCost(x =x, isUniqueKeyAttribute = false, isRangeQuery = true, s = s!!, bI1 = bl1, r = r)
                     )
                     // add the least cost for this attribute in the costPerAttr map
-                    costPerAttr.put("${nonKeyCosts.minBy { it.value }!!.key}", nonKeyCosts.minBy { it.value }!!.value)
+                    costPerAttr.add("${nonKeyCosts.minBy { it.value }!!.key}" to nonKeyCosts.minBy { it.value }!!.value)
 
                 }
 
             }
         }
+
+        costPerAttr = costPerAttr.distinct().toMutableList()
+        costPerAttr.add(0, "Best Cost Estimate --- "
+                to costPerAttr.filter{ !it.first.contains("Linear", ignoreCase = true)}
+            .sumOf { it.second })
+
+        costPerAttr.add("Worst Cost Estimate: Linear Search ---:" to
+                S1LinearSearch(true, false, false, if (targetTable.tableName.equals("Employee", ignoreCase = true)) 30 else 5))
 
         return costPerAttr
     }

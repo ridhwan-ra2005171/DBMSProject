@@ -258,11 +258,33 @@ object CostEstimatorRepo {
                     selectcostList = searchAlgorithms.S7ConjunctiveSelectCost(conditionList)
                     selectcostList.sortBy {  it.second } //sort by the cheapest
                     Log.d("selectcostListS&", "selectcostList: $selectcostList")
+
+
                     return selectcostList
 
 
 
                 }else{ // if doesn't contain AND, it contains OR's
+
+                    var targetTable = TableClass()
+
+                    if (tableName.equals("Employee", ignoreCase = true)){
+                        //outerTable = TableClass(writtenQuery[1], empBfr, empBlk, empRowCount)
+                        targetTable.tableName = tableName
+                        targetTable.bfr = 2
+                        targetTable.blockCount = 13
+                        targetTable.rowCount = 30
+//                        Log.d("outerT", "outertable: ${outerTable.tableName} + ${outerTable.bfr} + ${outerTable.blockCount} + ${outerTable.rowCount}")
+//                        println(outerTable)
+                    } else if (tableName.equals("Project", ignoreCase = true)){
+                        //outerTable = TableClass(writtenQuery[1], projBfr, projBlk, projRowCount)
+                        targetTable.tableName = tableName
+                        targetTable.bfr = 1
+                        targetTable.blockCount = 3
+                        targetTable.rowCount = 5
+//                        Log.d("outerT", "outertable: ${outerTable.tableName} + ${outerTable.bfr} + ${outerTable.blockCount} + ${outerTable.rowCount}")
+//                        println(outerTable)
+                    }
                     // OR
                     Log.d("conditions type", "OR query")
 
@@ -274,6 +296,17 @@ object CostEstimatorRepo {
                     for (condition in conditionList){
                         Log.d("Condition list", "Attribute name: ${condition.attributeName}, Operator: ${condition.operator}, Target value: ${condition.value}")
                     }
+
+                    selectcostList  = searchAlgorithms.S7DisjunctionSelectCost(
+                        conditionList = conditionList,
+                        targetTable = targetTable,
+                        indexMetadata = indexMetadatas,
+                        empMetadatas = empMetadatas,
+                        projectMetadatas = projectMetadatas)
+                    selectcostList.sortBy {  it.second } //sort by the cheapest
+                    Log.d("selectcostListS&", "selectcostList: $selectcostList")
+
+                    return selectcostList
 
                 }
 
@@ -340,19 +373,19 @@ object CostEstimatorRepo {
 //                    S3b------
                         var cost3b = S3bHashKeySelectCost() //[Working]
 //                    S6a------
-                        var costS6a = S6SecondaryIndexCost(x!!, true, false)
+//                        var costS6a = S6SecondaryIndexCost(x!!, true, false)
 
                         Log.d("PKequality", "costS1a:  ${costS1a} ")
                         Log.d("PKequality", "costS2a:  ${costS2a} ")
                         Log.d("PKequality", "cost3a:  ${cost3a} ")
                         Log.d("PKequality", "cost3b:  ${cost3b} ")
-                        Log.d("PKequality", "costS6a:  ${costS6a} ")
+//                        Log.d("PKequality", "costS6a:  ${costS6a} ")
 
                         selectcostList.add("S1 - Linear Search on unique Select" to costS1a)
                         selectcostList.add("S2a - Binary Search on Unique Select" to costS2a)
                         selectcostList.add("S3a - PrimaryKey index Select" to cost3a)
 //                    selectcostList.add("cost3b" to cost3b )
-                        selectcostList.add("S6a - Secondary Index on Unique Select" to costS6a)
+//                        selectcostList.add("S6a - Secondary Index on Unique Select" to costS6a)
 
 
 
@@ -560,15 +593,15 @@ object CostEstimatorRepo {
 
 //                    S6a------
 //                    var costS6a = S6SecondaryIndexCost(rowCount!!,1.0,empBfr!!)
-                        var costS6a = S6SecondaryIndexCost(x!!, true, false)
-                        Log.d("PKequality2", "costS6a:  ${costS6a} ")
+//                        var costS6a = S6SecondaryIndexCost(x!!, true, false)
+//                        Log.d("PKequality2", "costS6a:  ${costS6a} ")
 
 
                         selectcostList.add("S1a - Linear Search on unique Select" to costS1a)
                         selectcostList.add("S2b - Binary Search on unique Select" to costS2a)
                         selectcostList.add("S3a - PrimaryKey index Select" to cost3a)
 //                    selectcostList.add("costS6ab" to cost3b )
-                        selectcostList.add("S6ab - Secondary Index on unique Select" to costS6a)
+//                        selectcostList.add("S6ab - Secondary Index on unique Select" to costS6a)
 
                         return selectcostList
 
@@ -591,6 +624,7 @@ object CostEstimatorRepo {
                             equality = false,
                             blockCount = blockCount!!
                         )
+
 
                         var costS4 =
                             S4IndexForMultipleRecords(indexLevel = x!!, blockCount = blockCount)
