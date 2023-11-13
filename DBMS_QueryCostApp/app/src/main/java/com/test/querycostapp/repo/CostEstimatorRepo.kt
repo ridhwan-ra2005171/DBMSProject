@@ -59,6 +59,32 @@ fun valueExists(targetValue : String, targetAttribute: String, table: List<Any>)
     return exists
 }
 
+fun indexExists(selectedAttribute: String): Boolean {
+    var exists = false
+    var indexName: String? = null // Initialize indexName outside the when block
+
+    when (selectedAttribute.toLowerCase()) {
+        "projectno", "projectname", "description", "projectloc", "managedby" -> {
+            indexName = CostEstimatorRepo.projectMetadatas
+                .firstOrNull { it.ProjAttribute.equals(selectedAttribute, ignoreCase = true) }
+                ?.indexName
+        }
+        else -> {
+            indexName = CostEstimatorRepo.empMetadatas
+                .firstOrNull { it.EmpAttribute.equals(selectedAttribute, ignoreCase = true) }
+                ?.indexName
+        }
+    }
+
+    if (indexName != null) {
+        exists = true
+    }
+
+    return exists
+}
+
+
+
 // This method searches if the attribute entered exists in the tables columns
 // like if target Attribute is EmpNo from table Employee, it will return FALSE
 fun attributeExists(targetAttribute: String, table: List<Any>) : Boolean {
