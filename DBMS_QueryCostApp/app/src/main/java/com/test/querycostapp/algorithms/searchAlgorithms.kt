@@ -4,6 +4,10 @@ import android.util.Log
 import com.test.querycostapp.algorithms.searchAlgorithms.S2BinarySearchCost
 import com.test.querycostapp.algorithms.searchAlgorithms.S6SecondaryIndexCost
 import com.test.querycostapp.model.ConditionClass
+import com.test.querycostapp.model.EmployeeMetadata
+import com.test.querycostapp.model.IndexMetadata
+import com.test.querycostapp.model.ProjectMetadata
+import com.test.querycostapp.model.tableTypesClasses.TableClass
 import com.test.querycostapp.repo.CostEstimatorRepo
 import com.test.querycostapp.repo.indexExists
 import com.test.querycostapp.repo.valueExists
@@ -605,6 +609,135 @@ object searchAlgorithms{
 
         return selectcostList
     }
+
+    // COST OF OR QUERY
+    // Disjunction SELECT
+    //return int and double from the function
+    fun S7DisjunctionSelectCost( conditionList : List<ConditionClass>, targetTable: TableClass, indexMetadata: List<IndexMetadata>, empMetadatas: List<EmployeeMetadata>, projectMetadatas: List<ProjectMetadata>) : Map<String, Int> {
+
+        var b : Int;
+        var bfr : Int;
+        var r : Int;
+        if (targetTable.tableName.equals("Employee", ignoreCase = true)) {
+            empMetadatas
+            b = targetTable.blockCount!!
+            bfr = targetTable.bfr!!
+            r = targetTable.rowCount!!
+        } else {
+            projectMetadatas
+            b = targetTable.blockCount!!
+            bfr = targetTable.bfr!!
+            r = targetTable.rowCount!!
+        }
+
+        val allHaveIndex = conditionList.all { indexExists(it.attributeName) }
+
+        var costPerAttr : MutableMap<String, Int> = emptyMap<String, Int>().toMutableMap<String, Int>()
+
+        // If any attribute in the query has NO index, return the brute force cost
+        if (!allHaveIndex) {
+            return mapOf<String, Int>("S1 - Linear Search" to S1LinearSearch(true, false, false, if (targetTable.tableName.equals("Employee", ignoreCase = true)) 30 else 5))
+        }
+        // Equality:
+        // S1(key, nonkey, S2(key, nonkey), S3a(key), S6a (key, nonkey)
+        // Range
+        // If all the attributes involved in the query have an index
+        // Sum up the cost of those index searches
+        // IF ALL ATTRIBUTES HAVE INDEX
+        for (condition in conditionList) {
+            // Get the required values from the attribute metadata
+            var s : Double?
+
+            if (targetTable.tableName.equals("Employee", ignoreCase = true)) {
+                s = empMetadatas.firstOrNull { it.EmpAttribute.equals(condition.attributeName, ignoreCase = true) }?.selectionCardinality
+            } else {
+                s = projectMetadatas.firstOrNull { it.ProjAttribute.equals(condition.attributeName, ignoreCase = true) }?.selectionCardinality
+            }
+
+            val  x = indexMetadata.firstOrNull {it.indexName.equals("${targetTable.tableName}_${condition.attributeName}", ignoreCase = true)}?.level!!
+            val bl1 = indexMetadata.firstOrNull {it.indexName.equals("${targetTable.tableName}_${condition.attributeName}", ignoreCase = true)}?.firstLevelBlockCount!!
+
+
+            // Check if condition is equality first
+            if (condition.operator == "=") {
+                // Check if the attribute is unique
+                // Unique
+                if (listOf("ssn", "projectno").indexOf(condition.attributeName) >= 0) {
+                    // find the costs of each equality search
+                    val keyCosts: MutableMap<String, Int> = mutableMapOf()
+//                    keyCosts.put("${condition.attributeName}: S1 - Linear Search", searchAlgorithms.S1LinearSearch())
+                    keyCosts.put(
+                        "${condition.attributeName}: S2 - Binary Search",
+                        searchAlgorithms.S2BinarySearchCost(b = b, s = s!!, bfr = bfr)
+                    )
+                    keyCosts.put(
+                        "${condition.attributeName}: S3a - Primary Key Select",
+                        searchAlgorithms.S3aPrimaryKeySelectCost(x)
+                    )
+                    keyCosts.put(
+                        "${condition.attributeName}: S6a - Secondary Index",
+                        searchAlgorithms.S6SecondaryIndexCost(
+                            x = x,
+                            isUniqueKeyAttribute = true,
+                            isRangeQuery = false,
+                            s = s,
+                            bI1 = bl1,
+                            r = r
+                        )
+                    )
+                    // add the least cost for this attribute in the costPerAttr map
+                    costPerAttr.put(keyCosts.minBy { it.value }.key, keyCosts.minBy { it.value }.value)
+
+                } else { // Non-Unique
+                    val nonKeyCosts: MutableMap<String, Int> = mutableMapOf()
+//                nonKeyCosts.put("${condition.attributeName}: S1 - Linear Search", searchAlgorithms.S1LinearSearch())
+                    nonKeyCosts.put(
+                        "${condition.attributeName}: S2 - Binary Search",
+                        searchAlgorithms.S2BinarySearchCost(b= b , s = s!!, bfr = bfr)
+                    )
+                    nonKeyCosts.put(
+                        "${condition.attributeName}: S6a - Secondary Index",
+                        searchAlgorithms.S6SecondaryIndexCost(x = x, isUniqueKeyAttribute = false, isRangeQuery = false, s = s, bI1 = bl1, r = r)
+                    )
+                    // add the least cost for this attribute in the costPerAttr map
+                    costPerAttr.put(nonKeyCosts.minBy { it.value }.key, nonKeyCosts.minBy { it.value }.value)
+                }
+                // Range
+                // S1(key, nonkey), S4 (key), S6b (key, nonkey)
+            } else { // If condition is RANGE
+                // Check if the attribute is unique
+                if (listOf("ssn", "projectno").indexOf(condition.attributeName) >= 0) {
+                    val keyCosts: MutableMap<String, Int> = mutableMapOf()
+//                keyCosts.put("${condition.attributeName}: S1 - Linear Search", searchAlgorithms.S1LinearSearch())
+                    keyCosts.put(
+                        "${condition.attributeName}: S4 - Range Search",
+                        searchAlgorithms.S4IndexForMultipleRecords(indexLevel = x, blockCount = b)
+                    )
+                    keyCosts.put(
+                        "${condition.attributeName}: S6b - Secondary Index",
+                        searchAlgorithms.S6SecondaryIndexCost(x =x, isUniqueKeyAttribute = true, isRangeQuery = true, s = s!!, bI1 = bl1, r = r)
+                    )
+                    // add the least cost for this attribute in the costPerAttr map
+                    costPerAttr.put("${keyCosts.minBy { it.value }!!.key}", keyCosts.minBy { it.value }!!.value)
+
+                } else { // Non-Unique S1, S6b
+                    val nonKeyCosts: MutableMap<String, Int> = mutableMapOf()
+//                nonKeyCosts.put("${condition.attributeName}: S1 - Linear Search", searchAlgorithms.S1LinearSearch())
+                    nonKeyCosts.put(
+                        "${condition.attributeName}: S6b - Secondary Index",
+                        searchAlgorithms.S6SecondaryIndexCost(x =x, isUniqueKeyAttribute = false, isRangeQuery = true, s = s!!, bI1 = bl1, r = r)
+                    )
+                    // add the least cost for this attribute in the costPerAttr map
+                    costPerAttr.put("${nonKeyCosts.minBy { it.value }!!.key}", nonKeyCosts.minBy { it.value }!!.value)
+
+                }
+
+            }
+        }
+
+        return costPerAttr
+    }
+
 
 
 }
