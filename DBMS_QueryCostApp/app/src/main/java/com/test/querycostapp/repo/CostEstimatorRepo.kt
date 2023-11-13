@@ -7,6 +7,7 @@ import com.test.querycostapp.algorithms.searchAlgorithms.S3aPrimaryKeySelectCost
 import com.test.querycostapp.algorithms.searchAlgorithms.S3bHashKeySelectCost
 import com.test.querycostapp.algorithms.searchAlgorithms.S4IndexForMultipleRecords
 import com.test.querycostapp.algorithms.searchAlgorithms.S6SecondaryIndexCost
+import com.test.querycostapp.model.ConditionClass
 import com.test.querycostapp.model.Employee
 import com.test.querycostapp.model.EmployeeMetadata
 import com.test.querycostapp.model.IndexMetadata
@@ -200,268 +201,453 @@ object CostEstimatorRepo {
             Log.d("query[7]", "${writtenQuery[7]} ")
 
             var tableName = writtenQuery[fromIndex + 1] //gets table name
+            var whereIndex = writtenQuery.indexOf("WHERE") //index of the WHERE keyword
+            var queryLastIndex = writtenQuery.lastIndex //index of last item in the query
+            var conditionSize = queryLastIndex - whereIndex
+            Log.d("condition separator", "whereIndex: $whereIndex queryLastIndex: $queryLastIndex condition size: $conditionSize")
 
+            if(conditionSize > 3){ // more than one condition
+                var conditionList = mutableListOf<ConditionClass>()
+                var noOfConditions = conditionSize/3
+                Log.d("conditions", "Number of conditions: $noOfConditions")
+                if(writtenQuery.contains("AND")){ // check if the query contains ANDS
+                    // AND
+                    Log.d("conditions type", "AND query")
 
-            if(tableName.equals("Employee", ignoreCase = true)){ //handles employee table
-                Log.d("tablename", "Table Name: $tableName")
-
-                var blockCount = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.blockCount
-                var rowCount = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.rowCount
-                var empBfr = tableMetadatas.firstOrNull { it.tableName.equals("Employee", ignoreCase = true) }?.bfr
-                var x = indexMetadatas.firstOrNull { it.indexName.equals("Employee_SSN", ignoreCase = true) }?.level //returns level of index
-
-                // Check query type for Employee table
-                if (writtenQuery.contains("SSN") && writtenQuery.contains("=")) {
-                    // Primary Key and Equality Operator
-                    Log.d("queryType", "Primary Key and Equality Operator")
-                    var primaryKey = writtenQuery[writtenQuery.indexOf("SSN")] //position of primary key
-//                    var primaryKeyValue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
-                    var targetvalue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
-
-                    Log.d("primarykey", "primaryKey ${primaryKey} ")
-                    Log.d("primarykey", "blockCount ${blockCount} ")
-                    Log.d("primarykey", "primaryKeyValue ${targetvalue} ")
-//                    S1a-----
-                    var isFound = valueExists(targetvalue, "SSN", employees)
-                    var costS1a = S1LinearSearch(notFound = !isFound, unique = true, equality = true, blockCount = blockCount!!)
-//                    S2a------
-                    var costS2a = S2BinarySearchCost(blockCount!!,1.0,empBfr!!) //S=1 since its unique [WORKING]
-
-                    //S3a------
-                    var cost3a = S3aPrimaryKeySelectCost(x!!) //passes index level
-//                    S3b------
-                    var cost3b = S3bHashKeySelectCost() //[Working]
-//                    S6a------
-                    var costS6a = S6SecondaryIndexCost(x!!,true,false)
-
-                    Log.d("PKequality", "costS1a:  ${costS1a} ")
-                    Log.d("PKequality", "costS2a:  ${costS2a} ")
-                    Log.d("PKequality", "cost3a:  ${cost3a} ")
-                    Log.d("PKequality", "cost3b:  ${cost3b} ")
-                    Log.d("PKequality", "costS6a:  ${costS6a} ")
-
-                    selectcostList.add("S1 - Linear Search on unique Select" to costS1a )
-                    selectcostList.add("S2a - Binary Search on Unique Select" to costS2a )
-                    selectcostList.add("S3a - PrimaryKey index Select" to cost3a)
-//                    selectcostList.add("cost3b" to cost3b )
-                    selectcostList.add("S6a - Secondary Index on Unique Select" to costS6a )
-
-
-
-                    return selectcostList
-
-                } else if (writtenQuery.contains("SSN") && (writtenQuery.contains(">=") || writtenQuery.contains("<=")|| writtenQuery.contains("<")|| writtenQuery.contains(">"))) {
-                    // Range Operator using primary
-                    // S1 and S4
-                    Log.d("queryType", "Range Operator")
-
-                    var targetvalue = writtenQuery[writtenQuery.indexOf("SSN") + 2] //value of primary key
-                    var isFound = valueExists(targetvalue, "SSN", employees)
-
-                    var costS1c = S1LinearSearch(notFound = !isFound, unique = true, equality = false, blockCount = blockCount!!)
-                    var costS4 = S4IndexForMultipleRecords(indexLevel = x!!, blockCount = blockCount)
-
-                    Log.d("PKrange", "costS1c:  ${costS1c} ")
-                    Log.d("PKrange", "costS4:  ${costS4} ")
-
-                    selectcostList.add("CS1c - Linear Search" to costS1c)
-                    selectcostList.add("CS4 - Ordering-Index for multiple Records" to costS4)
-
-                    return selectcostList
-
-                } else if (!writtenQuery.contains("SSN") && writtenQuery.contains("=")) { //if doesnt contain primary (meaning uses non-primary key)
-                    // Non-Primary Key using Equality Operator
-                    Log.d("queryType", "Non-Primary Key using Equality Operator")
-                    var selectedAttribute = writtenQuery[writtenQuery.indexOf("WHERE") + 1] //gets selected attribute
-                    var s = empMetadatas.firstOrNull { it.EmpAttribute.equals(selectedAttribute, ignoreCase = true) }?.selectionCardinality //Selection Cardinality of attribute selected
-                    var bFirst = indexMetadatas.firstOrNull { it.indexName.equals("Employee_managerSSN", ignoreCase = true) }?.firstLevelBlockCount //first level block count of index
-                    Log.d("NPK", "selectedAttribute:  ${selectedAttribute}")
-                    Log.d("NPK", "s: ${s}")
-                    var targetvalue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
-
-
-                    //S1b
-                    var isfound = valueExists(targetvalue, selectedAttribute, employees)
-                    var costS1b = S1LinearSearch(notFound = !isfound, unique = false, equality = true, blockCount = blockCount!!)
-
-                    //S2b
-                    var costS2b = S2BinarySearchCost(blockCount!!,s!!,empBfr!!) // [WORKING]
-
-
-                    //S6ab secondary index on a non-key attribute with an equality condition
-                    var costS6ab = S6SecondaryIndexCost(x!!,false,false,s!!,bFirst!!)
-
-                    Log.d("NPKequality", "costS1b:  ${costS1b} ")
-                    Log.d("NPKequality", "costS2b:  ${costS2b} ")
-                    Log.d("NPKequality", "costS6a Nonkey:  ${costS6ab} ")
-
-                    selectcostList.add("S1b - Linear Search on non-primary Select" to costS1b )
-                    selectcostList.add("S2b - Binary Search on non-primary Select" to costS2b )
-                    selectcostList.add("S6ab - Secondary Index on non-primary Select" to costS6ab )
-
-                    return selectcostList
-
-
-                } else if ((writtenQuery.contains("HireDate") || writtenQuery.contains("DOB")) && (writtenQuery.contains(">=") || writtenQuery.contains("<=") || writtenQuery.contains("<")|| writtenQuery.contains(">"))) {
-                    // Non-Primary Key using Range Operator
-                    Log.d("queryType", "Non-Primary Key using Range Operator")
-                    // S1 and S6b
-                    var isHireDate = false // the attribute is DOB
-                    if (writtenQuery.contains("HireDate")){
-                        isHireDate = true // the attribute is Hire Date
+                    for (i in 1..noOfConditions){
+                        conditionList.add(ConditionClass(writtenQuery[whereIndex+1], writtenQuery[whereIndex+2], writtenQuery[whereIndex+3]))
+                        whereIndex += 4
                     }
 
-                    if (isHireDate){
-                        var targetvalue = writtenQuery[writtenQuery.indexOf("HireDate") + 2] //value of to be compared to
-                        var isFound = valueExists(targetvalue, "HireDate", employees)
-
-                        var costS1c = S1LinearSearch(notFound = !isFound, unique = false, equality = false, blockCount = blockCount!!)
-                        // var costS6b = S6SecondaryIndexCost(x!!,false,true,bI1 = first level block count,r = no of records)
-
-                        selectcostList.add("CS1c - Linear Search" to costS1c)
-                    }else{
-                        var targetvalue = writtenQuery[writtenQuery.indexOf("DOB") + 2] //value of to be compared to
-                        var isFound = valueExists(targetvalue, "DOB", employees)
-
-                        var costS1c = S1LinearSearch(notFound = !isFound, unique = false, equality = false, blockCount = blockCount!!)
-
-                        selectcostList.add("CS1c - Linear Search" to costS1c)
+                    for (condition in conditionList){
+                        Log.d("Condition list", "Attribute name: ${condition.attributeName}, Operator: ${condition.operator}, Target value: ${condition.value}")
                     }
 
-                    return selectcostList
+
+                }else{ // if doesn't contain AND, it contains OR's
+                    // OR
+                    Log.d("conditions type", "OR query")
+
+                    for (i in 1..noOfConditions){
+                        conditionList.add(ConditionClass(writtenQuery[whereIndex+1], writtenQuery[whereIndex+2], writtenQuery[whereIndex+3]))
+                        whereIndex += 4
+                    }
+
+                    for (condition in conditionList){
+                        Log.d("Condition list", "Attribute name: ${condition.attributeName}, Operator: ${condition.operator}, Target value: ${condition.value}")
+                    }
 
                 }
 
+            } else { // only one condition
 
-            }else if(tableName.equals("PROJECT", ignoreCase = true)){ //handles project table
-                Log.d("tablename", "Table Name: $tableName")
+                if (tableName.equals("Employee", ignoreCase = true)) { //handles employee table
+                    Log.d("tablename", "Table Name: $tableName")
 
-                var blockCount = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.blockCount
-                var rowCount = tableMetadatas.firstOrNull { it.tableName.equals("Project", ignoreCase = true) }?.rowCount
-                var projBfr = tableMetadatas.firstOrNull { it.tableName.equals("PROJECT", ignoreCase = true) }?.bfr
-                var x = indexMetadatas.firstOrNull { it.indexName.equals("Project_ProjectNo", ignoreCase = true) }?.level //returns level of index
+                    var blockCount = tableMetadatas.firstOrNull {
+                        it.tableName.equals(
+                            "Employee",
+                            ignoreCase = true
+                        )
+                    }?.blockCount
+                    var rowCount = tableMetadatas.firstOrNull {
+                        it.tableName.equals(
+                            "Employee",
+                            ignoreCase = true
+                        )
+                    }?.rowCount
+                    var empBfr = tableMetadatas.firstOrNull {
+                        it.tableName.equals(
+                            "Employee",
+                            ignoreCase = true
+                        )
+                    }?.bfr
+                    var x = indexMetadatas.firstOrNull {
+                        it.indexName.equals(
+                            "Employee_SSN",
+                            ignoreCase = true
+                        )
+                    }?.level //returns level of index
 
-
-                // Check query type for Project table
-                if (writtenQuery.contains("ProjectNo") && writtenQuery.contains("=")) {
-
-
-                    // Primary Key and Equality Operator
-                    Log.d("queryType2", "Primary Key and Equality Operator")
-                    var primaryKey = writtenQuery[writtenQuery.indexOf("ProjectNo")] //position of primary key
+                    // Check query type for Employee table
+                    if (writtenQuery.contains("SSN") && writtenQuery.contains("=")) {
+                        // Primary Key and Equality Operator
+                        Log.d("queryType", "Primary Key and Equality Operator")
+                        var primaryKey =
+                            writtenQuery[writtenQuery.indexOf("SSN")] //position of primary key
 //                    var primaryKeyValue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
-                    var targetvalue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
+                        var targetvalue =
+                            writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
 
-                    Log.d("primarykey2", "primaryKey ${primaryKey} ")
-                    Log.d("primarykey2", "blockCount ${blockCount} ")
+                        Log.d("primarykey", "primaryKey ${primaryKey} ")
+                        Log.d("primarykey", "blockCount ${blockCount} ")
+                        Log.d("primarykey", "primaryKeyValue ${targetvalue} ")
+//                    S1a-----
+                        var isFound = valueExists(targetvalue, "SSN", employees)
+                        var costS1a = S1LinearSearch(
+                            notFound = !isFound,
+                            unique = true,
+                            equality = true,
+                            blockCount = blockCount!!
+                        )
+//                    S2a------
+                        var costS2a = S2BinarySearchCost(
+                            blockCount!!,
+                            1.0,
+                            empBfr!!
+                        ) //S=1 since its unique [WORKING]
+
+                        //S3a------
+                        var cost3a = S3aPrimaryKeySelectCost(x!!) //passes index level
+//                    S3b------
+                        var cost3b = S3bHashKeySelectCost() //[Working]
+//                    S6a------
+                        var costS6a = S6SecondaryIndexCost(x!!, true, false)
+
+                        Log.d("PKequality", "costS1a:  ${costS1a} ")
+                        Log.d("PKequality", "costS2a:  ${costS2a} ")
+                        Log.d("PKequality", "cost3a:  ${cost3a} ")
+                        Log.d("PKequality", "cost3b:  ${cost3b} ")
+                        Log.d("PKequality", "costS6a:  ${costS6a} ")
+
+                        selectcostList.add("S1 - Linear Search on unique Select" to costS1a)
+                        selectcostList.add("S2a - Binary Search on Unique Select" to costS2a)
+                        selectcostList.add("S3a - PrimaryKey index Select" to cost3a)
+//                    selectcostList.add("cost3b" to cost3b )
+                        selectcostList.add("S6a - Secondary Index on Unique Select" to costS6a)
+
+
+
+                        return selectcostList
+
+                    } else if (writtenQuery.contains("SSN") && (writtenQuery.contains(">=") || writtenQuery.contains(
+                            "<="
+                        ) || writtenQuery.contains("<") || writtenQuery.contains(">"))
+                    ) {
+                        // Range Operator using primary
+                        // S1 and S4
+                        Log.d("queryType", "Range Operator")
+
+                        var targetvalue =
+                            writtenQuery[writtenQuery.indexOf("SSN") + 2] //value of primary key
+                        var isFound = valueExists(targetvalue, "SSN", employees)
+
+                        var costS1c = S1LinearSearch(
+                            notFound = !isFound,
+                            unique = true,
+                            equality = false,
+                            blockCount = blockCount!!
+                        )
+                        var costS4 =
+                            S4IndexForMultipleRecords(indexLevel = x!!, blockCount = blockCount)
+
+                        Log.d("PKrange", "costS1c:  ${costS1c} ")
+                        Log.d("PKrange", "costS4:  ${costS4} ")
+
+                        selectcostList.add("CS1c - Linear Search" to costS1c)
+                        selectcostList.add("CS4 - Ordering-Index for multiple Records" to costS4)
+
+                        return selectcostList
+
+                    } else if (!writtenQuery.contains("SSN") && writtenQuery.contains("=")) { //if doesnt contain primary (meaning uses non-primary key)
+                        // Non-Primary Key using Equality Operator
+                        Log.d("queryType", "Non-Primary Key using Equality Operator")
+                        var selectedAttribute =
+                            writtenQuery[writtenQuery.indexOf("WHERE") + 1] //gets selected attribute
+                        var s = empMetadatas.firstOrNull {
+                            it.EmpAttribute.equals(
+                                selectedAttribute,
+                                ignoreCase = true
+                            )
+                        }?.selectionCardinality //Selection Cardinality of attribute selected
+                        var bFirst = indexMetadatas.firstOrNull {
+                            it.indexName.equals(
+                                "Employee_managerSSN",
+                                ignoreCase = true
+                            )
+                        }?.firstLevelBlockCount //first level block count of index
+                        Log.d("NPK", "selectedAttribute:  ${selectedAttribute}")
+                        Log.d("NPK", "s: ${s}")
+                        var targetvalue =
+                            writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
+
+
+                        //S1b
+                        var isfound = valueExists(targetvalue, selectedAttribute, employees)
+                        var costS1b = S1LinearSearch(
+                            notFound = !isfound,
+                            unique = false,
+                            equality = true,
+                            blockCount = blockCount!!
+                        )
+
+                        //S2b
+                        var costS2b = S2BinarySearchCost(blockCount!!, s!!, empBfr!!) // [WORKING]
+
+
+                        //S6ab secondary index on a non-key attribute with an equality condition
+                        var costS6ab = S6SecondaryIndexCost(x!!, false, false, s!!, bFirst!!)
+
+                        Log.d("NPKequality", "costS1b:  ${costS1b} ")
+                        Log.d("NPKequality", "costS2b:  ${costS2b} ")
+                        Log.d("NPKequality", "costS6a Nonkey:  ${costS6ab} ")
+
+                        selectcostList.add("S1b - Linear Search on non-primary Select" to costS1b)
+                        selectcostList.add("S2b - Binary Search on non-primary Select" to costS2b)
+                        selectcostList.add("S6ab - Secondary Index on non-primary Select" to costS6ab)
+
+                        return selectcostList
+
+
+                    } else if ((writtenQuery.contains("HireDate") || writtenQuery.contains("DOB")) && (writtenQuery.contains(
+                            ">="
+                        ) || writtenQuery.contains("<=") || writtenQuery.contains("<") || writtenQuery.contains(
+                            ">"
+                        ))
+                    ) {
+                        // Non-Primary Key using Range Operator
+                        Log.d("queryType", "Non-Primary Key using Range Operator")
+                        // S1 and S6b
+                        var isHireDate = false // the attribute is DOB
+                        if (writtenQuery.contains("HireDate")) {
+                            isHireDate = true // the attribute is Hire Date
+                        }
+
+                        if (isHireDate) {
+                            var targetvalue =
+                                writtenQuery[writtenQuery.indexOf("HireDate") + 2] //value of to be compared to
+                            var isFound = valueExists(targetvalue, "HireDate", employees)
+
+                            var costS1c = S1LinearSearch(
+                                notFound = !isFound,
+                                unique = false,
+                                equality = false,
+                                blockCount = blockCount!!
+                            )
+                            // var costS6b = S6SecondaryIndexCost(x!!,false,true,bI1 = first level block count,r = no of records)
+
+                            selectcostList.add("CS1c - Linear Search" to costS1c)
+                        } else {
+                            var targetvalue =
+                                writtenQuery[writtenQuery.indexOf("DOB") + 2] //value of to be compared to
+                            var isFound = valueExists(targetvalue, "DOB", employees)
+
+                            var costS1c = S1LinearSearch(
+                                notFound = !isFound,
+                                unique = false,
+                                equality = false,
+                                blockCount = blockCount!!
+                            )
+
+                            selectcostList.add("CS1c - Linear Search" to costS1c)
+                        }
+
+                        return selectcostList
+
+                    }
+
+
+                } else if (tableName.equals("PROJECT", ignoreCase = true)) { //handles project table
+                    Log.d("tablename", "Table Name: $tableName")
+
+                    var blockCount = tableMetadatas.firstOrNull {
+                        it.tableName.equals(
+                            "Project",
+                            ignoreCase = true
+                        )
+                    }?.blockCount
+                    var rowCount = tableMetadatas.firstOrNull {
+                        it.tableName.equals(
+                            "Project",
+                            ignoreCase = true
+                        )
+                    }?.rowCount
+                    var projBfr = tableMetadatas.firstOrNull {
+                        it.tableName.equals(
+                            "PROJECT",
+                            ignoreCase = true
+                        )
+                    }?.bfr
+                    var x = indexMetadatas.firstOrNull {
+                        it.indexName.equals(
+                            "Project_ProjectNo",
+                            ignoreCase = true
+                        )
+                    }?.level //returns level of index
+
+
+                    // Check query type for Project table
+                    if (writtenQuery.contains("ProjectNo") && writtenQuery.contains("=")) {
+
+
+                        // Primary Key and Equality Operator
+                        Log.d("queryType2", "Primary Key and Equality Operator")
+                        var primaryKey =
+                            writtenQuery[writtenQuery.indexOf("ProjectNo")] //position of primary key
+//                    var primaryKeyValue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
+                        var targetvalue =
+                            writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
+
+                        Log.d("primarykey2", "primaryKey ${primaryKey} ")
+                        Log.d("primarykey2", "blockCount ${blockCount} ")
 
 //                    Log.d("primarykey", "primaryKeyValue ${primaryKeyValue} ")
 //                    S1a-----
-                    var isFound = valueExists(targetvalue, "ProjectNo", projects)
-                    Log.d("primarykey2", "isFound ${isFound} ")
+                        var isFound = valueExists(targetvalue, "ProjectNo", projects)
+                        Log.d("primarykey2", "isFound ${isFound} ")
 
-                    var costS1a = S1LinearSearch(notFound = !isFound, unique = true, equality = true, blockCount = blockCount!!)
-                    Log.d("PKequality2", "costS1a:  ${costS1a} ")
+                        var costS1a = S1LinearSearch(
+                            notFound = !isFound,
+                            unique = true,
+                            equality = true,
+                            blockCount = blockCount!!
+                        )
+                        Log.d("PKequality2", "costS1a:  ${costS1a} ")
 
 //                    S2a------
-                    var costS2a = S2BinarySearchCost(blockCount!!,1.0,projBfr!!) //S=1 since its unique [WORKING]
-                    Log.d("PKequality2", "costS2a:  ${costS2a} ")
+                        var costS2a = S2BinarySearchCost(
+                            blockCount!!,
+                            1.0,
+                            projBfr!!
+                        ) //S=1 since its unique [WORKING]
+                        Log.d("PKequality2", "costS2a:  ${costS2a} ")
 
-                    //S3a------
-                    var cost3a = S3aPrimaryKeySelectCost(x!!) //passes index level
-                    Log.d("PKequality2", "cost3a:  ${cost3a} ")
+                        //S3a------
+                        var cost3a = S3aPrimaryKeySelectCost(x!!) //passes index level
+                        Log.d("PKequality2", "cost3a:  ${cost3a} ")
 
 //                    S3b------
-                    var cost3b = S3bHashKeySelectCost() //[Working]
-                    Log.d("PKequality2", "cost3b:  ${cost3b} ")
+                        var cost3b = S3bHashKeySelectCost() //[Working]
+                        Log.d("PKequality2", "cost3b:  ${cost3b} ")
 
 //                    S6a------
 //                    var costS6a = S6SecondaryIndexCost(rowCount!!,1.0,empBfr!!)
-                    var costS6a = S6SecondaryIndexCost(x!!,true,false)
-                    Log.d("PKequality2", "costS6a:  ${costS6a} ")
+                        var costS6a = S6SecondaryIndexCost(x!!, true, false)
+                        Log.d("PKequality2", "costS6a:  ${costS6a} ")
 
 
-                    selectcostList.add("S1b - Linear Search on unique Select" to costS1a )
-                    selectcostList.add("S2b - Binary Search on unique Select" to costS2a )
-                    selectcostList.add("S3a - PrimaryKey index Select" to cost3a )
+                        selectcostList.add("S1b - Linear Search on unique Select" to costS1a)
+                        selectcostList.add("S2b - Binary Search on unique Select" to costS2a)
+                        selectcostList.add("S3a - PrimaryKey index Select" to cost3a)
 //                    selectcostList.add("costS6ab" to cost3b )
-                    selectcostList.add("S6ab - Secondary Index on unique Select" to costS6a )
+                        selectcostList.add("S6ab - Secondary Index on unique Select" to costS6a)
 
-                    return selectcostList
-
-
+                        return selectcostList
 
 
-                } else if (writtenQuery.contains("ProjectNo") && (writtenQuery.contains(">=") || writtenQuery.contains("<=") || writtenQuery.contains("<")|| writtenQuery.contains(">"))) {
-                    // Range Operator with primary index
-                    Log.d("queryType", "Range Operator")
-                    Log.d("queryType", "Range Operator")
+                    } else if (writtenQuery.contains("ProjectNo") && (writtenQuery.contains(">=") || writtenQuery.contains(
+                            "<="
+                        ) || writtenQuery.contains("<") || writtenQuery.contains(">"))
+                    ) {
+                        // Range Operator with primary index
+                        Log.d("queryType", "Range Operator")
+                        Log.d("queryType", "Range Operator")
 
-                    var targetvalue = writtenQuery[writtenQuery.indexOf("ProjectNo") + 2] //value of primary key
-                    var isFound = valueExists(targetvalue, "ProjectNo", projects)
+                        var targetvalue =
+                            writtenQuery[writtenQuery.indexOf("ProjectNo") + 2] //value of primary key
+                        var isFound = valueExists(targetvalue, "ProjectNo", projects)
 
-                    var costS1c = S1LinearSearch(notFound = !isFound, unique = true, equality = false, blockCount = blockCount!!)
+                        var costS1c = S1LinearSearch(
+                            notFound = !isFound,
+                            unique = true,
+                            equality = false,
+                            blockCount = blockCount!!
+                        )
 
-                    var costS4 = S4IndexForMultipleRecords(indexLevel = x!!, blockCount = blockCount)
+                        var costS4 =
+                            S4IndexForMultipleRecords(indexLevel = x!!, blockCount = blockCount)
 
-                    Log.d("PKrange", "costS1c:  ${costS1c} ")
-                    Log.d("PKrange", "costS4:  ${costS4} ")
+                        Log.d("PKrange", "costS1c:  ${costS1c} ")
+                        Log.d("PKrange", "costS4:  ${costS4} ")
 
-                    selectcostList.add("CS1c - Linear Search" to costS1c)
-                    selectcostList.add("CS4 - Ordering-Index for multiple Records" to costS4)
+                        selectcostList.add("CS1c - Linear Search" to costS1c)
+                        selectcostList.add("CS4 - Ordering-Index for multiple Records" to costS4)
 
-                    return selectcostList
+                        return selectcostList
 
-                } else if (!writtenQuery.contains("ProjectNo") && writtenQuery.contains("=")) {
-                    // Non-Primary Key using Equality Operator
-                    Log.d("queryType", "Non-Primary Key using Equality Operator")
+                    } else if (!writtenQuery.contains("ProjectNo") && writtenQuery.contains("=")) {
+                        // Non-Primary Key using Equality Operator
+                        Log.d("queryType", "Non-Primary Key using Equality Operator")
 
-                    var selectedAttribute = writtenQuery[writtenQuery.indexOf("WHERE") + 1] //gets selected attribute
-                    var s = projectMetadatas.firstOrNull { it.ProjAttribute.equals(selectedAttribute, ignoreCase = true) }?.selectionCardinality //Selection Cardinality of attribute selected
-                    var bFirst = indexMetadatas.firstOrNull { it.indexName.equals("Project_managedBy", ignoreCase = true) }?.firstLevelBlockCount //first level block count of index
-                    Log.d("NPK", "selectedAttribute:  ${selectedAttribute}")
-                    Log.d("NPK", "s: ${s}")
-                    var targetvalue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
-
-
-                    //S1b
-                    var isfound = valueExists(targetvalue, selectedAttribute, projects)
-                    var costS1b = S1LinearSearch(notFound = !isfound, unique = false, equality = true, blockCount = blockCount!!)
-                    Log.d("NPKequality2", "costS1b:  ${costS1b} ")
-                    //S2b
-                    var costS2b = S2BinarySearchCost(blockCount!!,s!!,projBfr!!) // [WORKING]
-                    Log.d("NPKequality2", "costS2b:  ${costS2b} ")
-
-                    //S6ab secondary index on a non-key attribute with an equality condition
-                    var costS6ab = S6SecondaryIndexCost(x!!,false,false,s!!,bFirst!!)
-                    Log.d("NPKequality2", "costS6a nonkey:  ${costS6ab} ")
-
-
-                    selectcostList.add("S1b - Linear Search on non-primary Select" to costS1b )
-                    selectcostList.add("S2b - Binary Search on non-primary Select" to costS2b )
-                    selectcostList.add("S6ab - Secondary Index on non-primary Select" to costS6ab )
-
-                    return selectcostList
-
-                } else if (writtenQuery.contains("ManagedBy") && (writtenQuery.contains(">=") || writtenQuery.contains("<=") || writtenQuery.contains("<")|| writtenQuery.contains(">"))) {
-                    // Non-Primary Key using Range Operator
-                    Log.d("queryType", "Non-Primary Key using Range Operator")
-                    var bFirst = indexMetadatas.firstOrNull { it.indexName.equals("Project_managedBy", ignoreCase = true) }?.firstLevelBlockCount //first level block count of index
-
-                    // S1 and S6b
-
-                    var targetvalue = writtenQuery[writtenQuery.indexOf("ManagedBy") + 2] //value of to be compared to
-                    var isFound = valueExists(targetvalue, "ManagedBy", employees)
-
-                    var costS1c = S1LinearSearch(notFound = !isFound, unique = false, equality = false, blockCount = blockCount!!)
-                    var costS6b = S6SecondaryIndexCost(x!!,false,true,bI1 = bFirst!! ,r = rowCount!!)
-
-                    selectcostList.add("CS1c - Linear Search" to costS1c)
-                    selectcostList.add("CS6b - Secondary Index on Non-Primary Range" to costS6b)
-
-                    return selectcostList
+                        var selectedAttribute =
+                            writtenQuery[writtenQuery.indexOf("WHERE") + 1] //gets selected attribute
+                        var s = projectMetadatas.firstOrNull {
+                            it.ProjAttribute.equals(
+                                selectedAttribute,
+                                ignoreCase = true
+                            )
+                        }?.selectionCardinality //Selection Cardinality of attribute selected
+                        var bFirst = indexMetadatas.firstOrNull {
+                            it.indexName.equals(
+                                "Project_managedBy",
+                                ignoreCase = true
+                            )
+                        }?.firstLevelBlockCount //first level block count of index
+                        Log.d("NPK", "selectedAttribute:  ${selectedAttribute}")
+                        Log.d("NPK", "s: ${s}")
+                        var targetvalue =
+                            writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
 
 
+                        //S1b
+                        var isfound = valueExists(targetvalue, selectedAttribute, projects)
+                        var costS1b = S1LinearSearch(
+                            notFound = !isfound,
+                            unique = false,
+                            equality = true,
+                            blockCount = blockCount!!
+                        )
+                        Log.d("NPKequality2", "costS1b:  ${costS1b} ")
+                        //S2b
+                        var costS2b = S2BinarySearchCost(blockCount!!, s!!, projBfr!!) // [WORKING]
+                        Log.d("NPKequality2", "costS2b:  ${costS2b} ")
+
+                        //S6ab secondary index on a non-key attribute with an equality condition
+                        var costS6ab = S6SecondaryIndexCost(x!!, false, false, s!!, bFirst!!)
+                        Log.d("NPKequality2", "costS6a nonkey:  ${costS6ab} ")
+
+
+                        selectcostList.add("S1b - Linear Search on non-primary Select" to costS1b)
+                        selectcostList.add("S2b - Binary Search on non-primary Select" to costS2b)
+                        selectcostList.add("S6ab - Secondary Index on non-primary Select" to costS6ab)
+
+                        return selectcostList
+
+                    } else if (writtenQuery.contains("ManagedBy") && (writtenQuery.contains(">=") || writtenQuery.contains(
+                            "<="
+                        ) || writtenQuery.contains("<") || writtenQuery.contains(">"))
+                    ) {
+                        // Non-Primary Key using Range Operator
+                        Log.d("queryType", "Non-Primary Key using Range Operator")
+                        var bFirst = indexMetadatas.firstOrNull {
+                            it.indexName.equals(
+                                "Project_managedBy",
+                                ignoreCase = true
+                            )
+                        }?.firstLevelBlockCount //first level block count of index
+
+                        // S1 and S6b
+
+                        var targetvalue =
+                            writtenQuery[writtenQuery.indexOf("ManagedBy") + 2] //value of to be compared to
+                        var isFound = valueExists(targetvalue, "ManagedBy", employees)
+
+                        var costS1c = S1LinearSearch(
+                            notFound = !isFound,
+                            unique = false,
+                            equality = false,
+                            blockCount = blockCount!!
+                        )
+                        var costS6b =
+                            S6SecondaryIndexCost(x!!, false, true, bI1 = bFirst!!, r = rowCount!!)
+
+                        selectcostList.add("CS1c - Linear Search" to costS1c)
+                        selectcostList.add("CS6b - Secondary Index on Non-Primary Range" to costS6b)
+
+                        return selectcostList
+
+
+                    }
                 }
             }
 
