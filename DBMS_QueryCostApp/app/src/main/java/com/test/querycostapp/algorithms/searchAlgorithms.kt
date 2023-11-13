@@ -631,7 +631,7 @@ object searchAlgorithms{
             r = targetTable.rowCount!!
         }
 
-        val allHaveIndex = conditionList.all { indexExists(it.attributeName) }
+        val allHaveIndex = conditionList.all { indexExists(it.attributeName.lowercase()) }
 
         var costPerAttr: MutableList<Pair<String, Int>> = mutableListOf() //to store it for displaying
 
@@ -677,17 +677,17 @@ object searchAlgorithms{
                         "${condition.attributeName}: S3a - Primary Key Select",
                         searchAlgorithms.S3aPrimaryKeySelectCost(x)
                     )
-                    keyCosts.put(
-                        "${condition.attributeName}: S6a - Secondary Index",
-                        searchAlgorithms.S6SecondaryIndexCost(
-                            x = x,
-                            isUniqueKeyAttribute = true,
-                            isRangeQuery = false,
-                            s = s,
-                            bI1 = bl1,
-                            r = r
-                        )
-                    )
+//                    keyCosts.put(
+//                        "${condition.attributeName}: S6a - Secondary Index",
+//                        searchAlgorithms.S6SecondaryIndexCost(
+//                            x = x,
+//                            isUniqueKeyAttribute = true,
+//                            isRangeQuery = false,
+//                            s = s,
+//                            bI1 = bl1,
+//                            r = r
+//                        )
+//                    )
                     // add the least cost for this attribute in the costPerAttr map
                     costPerAttr.add(keyCosts.minBy { it.value }.key to  keyCosts.minBy { it.value }.value)
 
@@ -698,6 +698,7 @@ object searchAlgorithms{
                         "${condition.attributeName}: S2 - Binary Search",
                         searchAlgorithms.S2BinarySearchCost(b= b , s = s!!, bfr = bfr)
                     )
+                    
                     nonKeyCosts.put(
                         "${condition.attributeName}: S6a - Secondary Index",
                         searchAlgorithms.S6SecondaryIndexCost(x = x, isUniqueKeyAttribute = false, isRangeQuery = false, s = s, bI1 = bl1, r = r)
@@ -716,10 +717,10 @@ object searchAlgorithms{
                         "${condition.attributeName}: S4 - Range Search",
                         searchAlgorithms.S4IndexForMultipleRecords(indexLevel = x, blockCount = b)
                     )
-                    keyCosts.put(
-                        "${condition.attributeName}: S6b - Secondary Index",
-                        searchAlgorithms.S6SecondaryIndexCost(x =x, isUniqueKeyAttribute = true, isRangeQuery = true, s = s!!, bI1 = bl1, r = r)
-                    )
+//                    keyCosts.put(
+//                        "${condition.attributeName}: S6b - Secondary Index",
+//                        searchAlgorithms.S6SecondaryIndexCost(x =x, isUniqueKeyAttribute = true, isRangeQuery = true, s = s!!, bI1 = bl1, r = r)
+//                    )
                     // add the least cost for this attribute in the costPerAttr map
                     costPerAttr.add("${keyCosts.minBy { it.value }!!.key}" to keyCosts.minBy { it.value }!!.value)
 
