@@ -63,18 +63,19 @@ fun indexExists(selectedAttribute: String): Boolean {
     var exists = false
     var indexName: String? = null // Initialize indexName outside the when block
 
-    when (selectedAttribute.toLowerCase()) {
-        "projectno", "projectname", "description", "projectloc", "managedby" -> {
-            indexName = CostEstimatorRepo.projectMetadatas
-                .firstOrNull { it.ProjAttribute.equals(selectedAttribute, ignoreCase = true) }
-                ?.indexName
-        }
-        else -> {
-            indexName = CostEstimatorRepo.empMetadatas
-                .firstOrNull { it.EmpAttribute.equals(selectedAttribute, ignoreCase = true) }
-                ?.indexName
-        }
+    if (listOf("projectno", "projectname", "description", "projectloc", "managedby").indexOf(element = selectedAttribute.lowercase()) >= 0) {
+//        println("IM HERE")
+//        println(CostEstimatorRepo.projectMetadatas[0])
+        indexName = CostEstimatorRepo.projectMetadatas
+            .firstOrNull { it.ProjAttribute.equals(selectedAttribute, ignoreCase = true) }
+            ?.indexName
+
+    } else {
+        indexName = CostEstimatorRepo.empMetadatas
+            .firstOrNull { it.EmpAttribute.equals(selectedAttribute, ignoreCase = true) }
+            ?.indexName
     }
+
 
     if (indexName != null) {
         exists = true
@@ -174,9 +175,11 @@ fun main(args: Array<String>) {
         ),
     )
 
-    println(valueExists("123", "SsN", testListEmp ))
-    println(attributeExists("PrOjEctno",testListProject))
+//    println(valueExists("123", "SsN", testListEmp ))
+//    println(attributeExists("PrOjEctno",testListProject))
 
+    println(indexExists("projeCtno"))
+    println(indexExists("ssn"))
 }
 
 enum class QUERY_TYPE {

@@ -39,6 +39,7 @@ import com.test.querycostapp.repo.dataRepos.IndexMetaRepo
 import com.test.querycostapp.repo.dataRepos.ProjMetaRepo
 import com.test.querycostapp.repo.dataRepos.ProjectRepo
 import com.test.querycostapp.repo.dataRepos.TablesMetaRepo
+import com.test.querycostapp.repo.indexExists
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,6 +69,10 @@ fun QueryScreen2() {
     CostEstimatorRepo.indexMetadatas = IndexMetaRepo.initIndexMetadatas(LocalContext.current).toMutableList()
 
     Log.d("METADATA", CostEstimatorRepo.tableMetadatas.toString())
+    Log.d("SMTH", "ssn " + indexExists("ssn").toString())
+    Log.d("SMTH", "fnaMe " + indexExists("fnaMe").toString())
+    Log.d("SMTH", "proJectNo " + indexExists("proJectNo").toString())
+    Log.d("SMTH", "description " + indexExists("description").toString())
 
     Column(
         modifier = Modifier
