@@ -665,7 +665,7 @@ object searchAlgorithms{
             if (condition.operator == "=") {
                 // Check if the attribute is unique
                 // Unique
-                if (listOf("ssn", "projectno").indexOf(condition.attributeName) >= 0) {
+                if (listOf("ssn", "projectno").indexOf(condition.attributeName.lowercase()) >= 0) {
                     // find the costs of each equality search
                     val keyCosts: MutableMap<String, Int> = mutableMapOf()
 //                    keyCosts.put("${condition.attributeName}: S1 - Linear Search", searchAlgorithms.S1LinearSearch())
@@ -698,7 +698,7 @@ object searchAlgorithms{
                         "${condition.attributeName}: S2 - Binary Search",
                         searchAlgorithms.S2BinarySearchCost(b= b , s = s!!, bfr = bfr)
                     )
-                    
+
                     nonKeyCosts.put(
                         "${condition.attributeName}: S6a - Secondary Index",
                         searchAlgorithms.S6SecondaryIndexCost(x = x, isUniqueKeyAttribute = false, isRangeQuery = false, s = s, bI1 = bl1, r = r)
@@ -710,7 +710,7 @@ object searchAlgorithms{
                 // S1(key, nonkey), S4 (key), S6b (key, nonkey)
             } else { // If condition is RANGE
                 // Check if the attribute is unique
-                if (listOf("ssn", "projectno").indexOf(condition.attributeName) >= 0) {
+                if (listOf("ssn", "projectno").indexOf(condition.attributeName.lowercase()) >= 0) {
                     val keyCosts: MutableMap<String, Int> = mutableMapOf()
 //                keyCosts.put("${condition.attributeName}: S1 - Linear Search", searchAlgorithms.S1LinearSearch())
                     keyCosts.put(
@@ -744,7 +744,7 @@ object searchAlgorithms{
                 to costPerAttr.filter{ !it.first.contains("Linear", ignoreCase = true)}
             .sumOf { it.second })
 
-        costPerAttr.add("Worst Cost Estimate: Linear Search ---:" to
+        costPerAttr.add("Worst Cost Estimate: Linear Search --- " to
                 S1LinearSearch(true, false, false, if (targetTable.tableName.equals("Employee", ignoreCase = true)) 30 else 5))
 
         return costPerAttr
