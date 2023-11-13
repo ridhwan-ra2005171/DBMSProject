@@ -75,7 +75,7 @@ fun JoinScreen() {
 
     var resetClicked by rememberSaveable { mutableStateOf(false)}
 
-    var costList : Map<String, Double> by rememberSaveable {
+    var costList : Map<String, Int> by rememberSaveable {
         mutableStateOf(
             emptyMap()
 //            mapOf( "Example 1" to 0.0, "Example 2" to 0.0, "Example 3" to 0.0)

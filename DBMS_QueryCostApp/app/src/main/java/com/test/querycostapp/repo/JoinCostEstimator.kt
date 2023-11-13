@@ -16,7 +16,8 @@ object JoinCostEstimator {
                     indexMetadata : MutableList<IndexMetadata>,
                     noOfBuffers : Int,
                     innerTableHasHash : Boolean
-    ) : Map<String, Double> {
+    ) : Map<String, Int> {
+
         val js = 1.0 / Math.max(
             empMetadata.find { it.EmpAttribute.equals("SSN", ignoreCase = true) }?.NDV!!,
             projectMetadata.find { it.ProjAttribute.equals("ManagedBy", ignoreCase = true) }?.NDV!!
@@ -115,7 +116,7 @@ object JoinCostEstimator {
         )
 
         // The costs of each join, stored in a list
-        val cost_list = mutableMapOf<String, Double>(
+        val cost_list = mutableMapOf(
             "CJ1 - Nested-Loop join" to CJ1,
             "CJ2a - Index-based join (Secondary Index)" to CJ2a,
             "CJ2b - Index-based join (Cluster Index)" to CJ2b,

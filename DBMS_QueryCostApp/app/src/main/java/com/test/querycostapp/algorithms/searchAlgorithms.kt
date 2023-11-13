@@ -12,16 +12,16 @@ object searchAlgorithms{
     // if select is EQUALITY and KEY, cost = b/2
     // if select is EQUALITY and NON-KEY, cost = b
     // if select is RANGE, cost = b
-    fun S1LinearSearch(notFound : Boolean, unique : Boolean, equality : Boolean, blockCount : Int) : Double {
+    fun S1LinearSearch(notFound : Boolean, unique : Boolean, equality : Boolean, blockCount : Int) : Int {
         // assign blockCount to cost
         var cost = blockCount.toDouble()
         // if the select is NOT an equality, the attribute is not unique i.e. non key, or the record doesn't exist; return the number of blocks i.e. the cost
-        if (!equality or !unique or notFound) {
-            return cost
+        return kotlin.math.ceil( if (!equality or !unique or notFound) {
+             cost
         } else {
             // if the select is an equality, the attribute is unique and the record exists; return HALF of the number of blocks i.e. cost/2
-            return cost / 2
-        }
+             cost / 2
+        }).toInt()
     }
 
 
@@ -32,14 +32,14 @@ object searchAlgorithms{
 //    log2b + ceil[ (s/bfr)] -1 fileblocks
 //            reduces to log2b if equality condition is on unique key / attribute. ( just make s=1 when its on unique)
 
-    fun S2BinarySearchCost(b: Int, s: Double, bfr: Int): Double {
-        return if (s == 1.0) {
+    fun S2BinarySearchCost(b: Int, s: Double, bfr: Int): Int {
+        return kotlin.math.ceil(if (s == 1.0) {
             // When s is 1 (equality on a unique key attribute)
             log2(b.toDouble())
         } else {
             // For other scenarios if not on unique key
             log2(b.toDouble()) + ceil(s / bfr) - 1
-        }
+        }).toInt()
     }
 
     //S3a CS3a = x + 1.0, x is levels of index
@@ -47,8 +47,8 @@ object searchAlgorithms{
         return x + 1
     }
 
-    fun S3bHashKeySelectCost(): Double{
-        return 1.0
+    fun S3bHashKeySelectCost(): Int {
+        return kotlin.math.ceil(1.0).toInt()
     }
 
     // S4—Using an ordering index to retrieve multiple records.
@@ -60,8 +60,8 @@ object searchAlgorithms{
     // on the average, it may be inaccurate in individual cases. A more accurate
     // estimate is possible if the distribution of records is stored in a histogram
     //----------------------------------------------------------------------------------------------
-    fun S4IndexForMultipleRecords(indexLevel: Int, blockCount: Int): Double {
-        return indexLevel.toDouble() + ((blockCount.toDouble()) / 2)
+    fun S4IndexForMultipleRecords(indexLevel: Int, blockCount: Int): Int {
+        return kotlin.math.ceil(indexLevel.toDouble() + ((blockCount.toDouble()) / 2)).toInt()
     }
 
 
@@ -70,8 +70,8 @@ object searchAlgorithms{
     //for secondary on nonkey attribute, cost is CS6a = x + 1 + s [s is selection cardinality]
     //S6b -> for range queries The cost estimate for this case, approximately, is CS6b = x + (bI1/2) + (r/2) [bI1 is the number of blocks in the index, r is the number of records in the index]
 
-    fun S6SecondaryIndexCost(x: Int, isUniqueKeyAttribute: Boolean, isRangeQuery: Boolean, s: Double = 0.0, bI1: Int = 0, r: Int = 0): Double {
-        return if (!isRangeQuery) {
+    fun S6SecondaryIndexCost(x: Int, isUniqueKeyAttribute: Boolean, isRangeQuery: Boolean, s: Double = 0.0, bI1: Int = 0, r: Int = 0): Int {
+        return kotlin.math.ceil(if (!isRangeQuery) {
             if (isUniqueKeyAttribute) {
                 // S6a -> For a secondary index on a unique key attribute with an equality condition
                 x + 1.0
@@ -84,7 +84,7 @@ object searchAlgorithms{
 
             // S6b -> For a secondary index on a unique key attribute with a range query
             x + (bI1 / 2.0) + (r / 2.0)
-        }
+        }).toInt()
     }
 
 }

@@ -7,9 +7,10 @@ import kotlin.math.roundToInt
 object joinAlgorithms {
 
     // J1—Nested-loop join
-    fun J1NestedLoopJoinCost(bR: Int?, bS: Int?, js: Double?, R: Int?, S: Int?, bfrRS: Int?, nB: Int) : Double{
+    fun J1NestedLoopJoinCost(bR: Int?, bS: Int?, js: Double?, R: Int?, S: Int?, bfrRS: Int?, nB: Int) : Int {
 
-        return  bR!! + (ceil((bR!!/(nB-2)).toDouble()) * bS!!) + (js!! * R!! * S!!) / bfrRS!!.toDouble()
+        val c1 =  bR!! + (ceil((bR!!/(nB-2)).toDouble()) * bS!!) + (js!! * R!! * S!!) / bfrRS!!.toDouble()
+        return ceil(c1).toInt()
     }
 
 
@@ -28,7 +29,7 @@ object joinAlgorithms {
                              bfrRS : Int?,
                              hasSecondaryIndex : Boolean, hasClusterIndex : Boolean, hasPrimaryIndex : Boolean,
                              innerTableHasHash: Boolean,
-                             ) : Map<String, Double> {
+                             ) : Map<String, Int> {
 
 
         var c1 = 0.0; var c2 =0.0; var c3 =0.0; var c4 = 0.0
@@ -64,7 +65,7 @@ object joinAlgorithms {
         }
 
         // return a map of the cost functions in descending order
-        return mapOf<String, Double>("CJ2a(secondary)" to c1, "CJ2b(cluster)" to c2, "CJ2c(primary)" to c3, "CJ2d(hash)" to c4)
+        return mapOf<String, Int>("CJ2a(secondary)" to ceil(c1).toInt(), "CJ2b(cluster)" to ceil(c2).toInt(), "CJ2c(primary)" to ceil(c3).toInt(), "CJ2d(hash)" to ceil(c4).toInt())
 //            .toSortedMap(compareByDescending { it })
     }
 
@@ -82,13 +83,13 @@ fun J3SortMergeJoinCost(
     bfrRS: Int?, // Blocking factor of R and S
     outerSorted: Boolean, // Whether outer table is sorted
     innerSorted: Boolean // Whether inner table is sorted
-): Double {
+): Int {
     // CJ3a = bR + bS + ((js * R * S) / bfrRS)
     val CJ3a = bR!! + bS!! + (js!! * R!! * S!!) / bfrRS!!.toDouble()
     val dM = 10 // Assuming dM (M-way merge) is a constant value
     val nR = R!! + S!! // Combined number of records in R and S
 
-    return if (!outerSorted && !innerSorted) {
+    return ceil(if (!outerSorted && !innerSorted) {
         // If sorting is needed on both tables, add 2 * ((2 * b) + (2 * b * (logdM nR)))
         CJ3a + 2 * ((2 * bR!!) + (2 * bR!! * log(dM.toDouble(), nR.toDouble())).roundToInt().toDouble())
 
@@ -98,15 +99,15 @@ fun J3SortMergeJoinCost(
     } else {
         // No sorting needed
         CJ3a
-    }
+    }).toInt()
 }
 
 
     // J4—Partition–hash join (or just hash join)
     //
-    fun J4PartitionHashJoinCost(bR: Int?, bS: Int?, js: Double?, R: Int?, S: Int?, bfrRS: Int?): Double{
+    fun J4PartitionHashJoinCost(bR: Int?, bS: Int?, js: Double?, R: Int?, S: Int?, bfrRS: Int?): Int{
         val CJ4 = 3 * (bR!! + bS!!) + (js!! * R!! * S!!) / bfrRS!!.toDouble()
-        return CJ4
+        return ceil( CJ4).toInt()
     }
 
 }
