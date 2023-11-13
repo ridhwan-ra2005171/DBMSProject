@@ -1,6 +1,7 @@
 package com.test.querycostapp.repo
 
 import android.util.Log
+import com.test.querycostapp.algorithms.searchAlgorithms
 import com.test.querycostapp.algorithms.searchAlgorithms.S1LinearSearch
 import com.test.querycostapp.algorithms.searchAlgorithms.S2BinarySearchCost
 import com.test.querycostapp.algorithms.searchAlgorithms.S3aPrimaryKeySelectCost
@@ -250,7 +251,15 @@ object CostEstimatorRepo {
 
                     for (condition in conditionList){
                         Log.d("Condition list", "Attribute name: ${condition.attributeName}, Operator: ${condition.operator}, Target value: ${condition.value}")
+
+
+
                     }
+                    selectcostList = searchAlgorithms.S7ConjunctiveSelectCost(conditionList)
+                    selectcostList.sortBy {  it.second } //sort by the cheapest
+                    Log.d("selectcostListS&", "selectcostList: $selectcostList")
+                    return selectcostList
+
 
 
                 }else{ // if doesn't contain AND, it contains OR's
@@ -555,7 +564,7 @@ object CostEstimatorRepo {
                         Log.d("PKequality2", "costS6a:  ${costS6a} ")
 
 
-                        selectcostList.add("S1b - Linear Search on unique Select" to costS1a)
+                        selectcostList.add("S1a - Linear Search on unique Select" to costS1a)
                         selectcostList.add("S2b - Binary Search on unique Select" to costS2a)
                         selectcostList.add("S3a - PrimaryKey index Select" to cost3a)
 //                    selectcostList.add("costS6ab" to cost3b )

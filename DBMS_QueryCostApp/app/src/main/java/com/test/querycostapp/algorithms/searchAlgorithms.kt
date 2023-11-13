@@ -1,7 +1,12 @@
 package com.test.querycostapp.algorithms
 
+import android.util.Log
 import com.test.querycostapp.algorithms.searchAlgorithms.S2BinarySearchCost
 import com.test.querycostapp.algorithms.searchAlgorithms.S6SecondaryIndexCost
+import com.test.querycostapp.model.ConditionClass
+import com.test.querycostapp.repo.CostEstimatorRepo
+import com.test.querycostapp.repo.indexExists
+import com.test.querycostapp.repo.valueExists
 import kotlin.math.ceil
 import kotlin.math.log2
 
@@ -89,10 +94,518 @@ object searchAlgorithms{
 
 
     //S7 Conjunctive (AND)
-    //S7DisjunctionCost
-//    fun S7DisjunctionCost(): Int {
-//
-//    }
+    fun S7ConjunctiveSelectCost(conditionList:MutableList<ConditionClass>): MutableList<Pair<String, Int>> {
+//        val operations = selectedAttrList.zip(operatorList)
+        var selectcostList: MutableList<Pair<String, Int>> = mutableListOf() //to store it for displaying
+
+        var ExistIndex = false
+        conditionList.forEach{
+            println(it.attributeName) //selected attr
+            println(it.operator) //operator
+
+
+
+
+            var selectedAttribute = it.attributeName
+
+            ExistIndex = indexExists(it.attributeName)
+            Log.d("S7Index", "S7Index: ${ExistIndex}")
+
+            if (ExistIndex) {
+
+                if (listOf("projectno", "projectname", "description", "projectloc", "managedby").indexOf(element = it.attributeName.lowercase()) >= 0) {
+                    //get needed arguments for the cost in project
+                    var blockCount = CostEstimatorRepo.tableMetadatas.firstOrNull {
+                        it.tableName.equals(
+                            "Project",
+                            ignoreCase = true
+                        )
+                    }?.blockCount
+                    var rowCount = CostEstimatorRepo.tableMetadatas.firstOrNull {
+                        it.tableName.equals(
+                            "Project",
+                            ignoreCase = true
+                        )
+                    }?.rowCount
+                    var projBfr = CostEstimatorRepo.tableMetadatas.firstOrNull {
+                        it.tableName.equals(
+                            "PROJECT",
+                            ignoreCase = true
+                        )
+                    }?.bfr
+                    var x = CostEstimatorRepo.indexMetadatas.firstOrNull {
+                        it.indexName.equals(
+                            "Project_ProjectNo",
+                            ignoreCase = true
+                        )
+                    }?.level //returns level of index
+
+
+
+
+
+                    if (it.attributeName.equals("projectno", ignoreCase = true)) { //if primary
+
+                        if (it.operator.equals("=")){ //handles equality primary
+
+                            var primaryKey =
+                                CostEstimatorRepo.writtenQuery[CostEstimatorRepo.writtenQuery.indexOf("ProjectNo")] //position of primary key
+
+
+
+//                    S2a------
+                            var costS2a = S2BinarySearchCost(
+                                blockCount!!,
+                                1.0,
+                                projBfr!!
+                            ) //S=1 since its unique [WORKING]
+                            Log.d("PKequality2", "costS2a:  ${costS2a} ")
+
+                            //S3a------
+                            var cost3a = S3aPrimaryKeySelectCost(x!!) //passes index level
+                            Log.d("PKequality2", "cost3a:  ${cost3a} ")
+
+//                    S3b------
+                            var cost3b = S3bHashKeySelectCost() //[Working]
+                            Log.d("PKequality2", "cost3b:  ${cost3b} ")
+
+//                    S6a------
+//                    var costS6a = S6SecondaryIndexCost(rowCount!!,1.0,empBfr!!)
+                            var costS6a = S6SecondaryIndexCost(x!!, true, false)
+                            Log.d("PKequality2", "costS6a:  ${costS6a} ")
+
+
+                            selectcostList.add("S2b - Binary Search on unique Select" to costS2a)
+                            selectcostList.add("S3a - PrimaryKey index Select" to cost3a)
+//                    selectcostList.add("costS6ab" to cost3b )
+                            selectcostList.add("S6ab - Secondary Index on unique Select" to costS6a)
+
+                            return selectcostList
+
+
+                        }else if (it.operator.equals(">") || it.operator.equals("<") || it.operator.equals(">=") || it.operator.equals("<=")){ //handles range
+
+
+                            var costS4 =
+                                S4IndexForMultipleRecords(indexLevel = x!!, blockCount = blockCount!!)
+
+                            Log.d("PKrange", "costS4:  ${costS4} ")
+
+                            selectcostList.add("CS4 - Ordering-Index for multiple Records" to costS4)
+
+                            return selectcostList
+
+                        }
+
+                    }else{ //if non primary
+
+                        if (it.operator.equals("=")){ //handles equality
+
+                            var s = CostEstimatorRepo.projectMetadatas.firstOrNull {
+                                it.ProjAttribute.equals(
+                                    selectedAttribute
+                                )
+                            }?.selectionCardinality //Selection Cardinality of attribute selected
+                            var bFirst = CostEstimatorRepo.indexMetadatas.firstOrNull {
+                                it.indexName.equals(
+                                    "Project_managedBy",
+                                    ignoreCase = true
+                                )
+                            }?.firstLevelBlockCount //first level block count of index
+                            Log.d("NPK", "s: ${s}")
+                            var targetvalue =
+                                CostEstimatorRepo.writtenQuery[CostEstimatorRepo.writtenQuery.indexOf("=") + 1] //value of primary key
+
+
+
+
+                            //S2b
+                            var costS2b = S2BinarySearchCost(blockCount!!, s!!, projBfr!!) // [WORKING]
+                            Log.d("NPKequality2", "costS2b:  ${costS2b} ")
+
+                            //S6ab secondary index on a non-key attribute with an equality condition
+                            var costS6ab = S6SecondaryIndexCost(x!!, false, false, s!!, bFirst!!)
+                            Log.d("NPKequality2", "costS6a nonkey:  ${costS6ab} ")
+
+
+                            selectcostList.add("S2b - Binary Search on non-primary Select" to costS2b)
+                            selectcostList.add("S6ab - Secondary Index on non-primary Select" to costS6ab)
+                            Log.d("S7ConjunctiveSelectCost", "S7ConjunctiveSelectCost: ${selectcostList}")
+                            return selectcostList
+
+                        }else if (!it.operator.equals("=")){ //handles range
+
+                            var bFirst = CostEstimatorRepo.indexMetadatas.firstOrNull {
+                                it.indexName.equals(
+                                    "Project_managedBy",
+                                    ignoreCase = true
+                                )
+                            }?.firstLevelBlockCount //first level block count of index
+
+                            // S1 and S6b
+
+                            var targetvalue =
+                                CostEstimatorRepo.writtenQuery[CostEstimatorRepo.writtenQuery.indexOf("ManagedBy") + 2] //value of to be compared to
+                            var isFound = valueExists(targetvalue, "ManagedBy",
+                                CostEstimatorRepo.employees
+                            )
+
+                            var costS6b =
+                                S6SecondaryIndexCost(x!!, false, true, bI1 = bFirst!!, r = rowCount!!)
+
+                            selectcostList.add("CS6b - Secondary Index on Non-Primary Range" to costS6b)
+
+                            return selectcostList
+
+                        }
+
+                    }
+
+                } else { //handle employee table
+                    //get needed arguments for the cost in employee
+                    var blockCount = CostEstimatorRepo.tableMetadatas.firstOrNull {
+                        it.tableName.equals(
+                            "Employee",
+                            ignoreCase = true
+                        )
+                    }?.blockCount
+                    var rowCount = CostEstimatorRepo.tableMetadatas.firstOrNull {
+                        it.tableName.equals(
+                            "Employee",
+                            ignoreCase = true
+                        )
+                    }?.rowCount
+                    var empBfr = CostEstimatorRepo.tableMetadatas.firstOrNull {
+                        it.tableName.equals(
+                            "Employee",
+                            ignoreCase = true
+                        )
+                    }?.bfr
+                    var x = CostEstimatorRepo.indexMetadatas.firstOrNull {
+                        it.indexName.equals(
+                            "Employee_SSN",
+                            ignoreCase = true
+                        )
+                    }?.level //returns level of index
+
+
+                    if (it.attributeName.equals("ssn", ignoreCase = true)) { //if primary
+
+
+
+                        if (it.operator.equals("=")) { //handles equality primary
+
+                            var primaryKey =
+                                CostEstimatorRepo.writtenQuery[CostEstimatorRepo.writtenQuery.indexOf("SSN")] //position of primary key
+//                    var primaryKeyValue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
+                            var targetvalue =
+                                CostEstimatorRepo.writtenQuery[CostEstimatorRepo.writtenQuery.indexOf("=") + 1] //value of primary key
+
+                            Log.d("primarykey", "primaryKey ${primaryKey} ")
+                            Log.d("primarykey", "blockCount ${blockCount} ")
+                            Log.d("primarykey", "primaryKeyValue ${targetvalue} ")
+
+
+//                    S2a------
+                            var costS2a = S2BinarySearchCost(
+                                blockCount!!,
+                                1.0,
+                                empBfr!!
+                            ) //S=1 since its unique [WORKING]
+
+                            //S3a------
+                            var cost3a = S3aPrimaryKeySelectCost(x!!) //passes index level
+//                    S3b------
+                            var cost3b = S3bHashKeySelectCost() //[Working]
+//                    S6a------
+                            var costS6a = S6SecondaryIndexCost(x!!, true, false)
+
+                            Log.d("PKequality", "costS2a:  ${costS2a} ")
+                            Log.d("PKequality", "cost3a:  ${cost3a} ")
+                            Log.d("PKequality", "cost3b:  ${cost3b} ")
+                            Log.d("PKequality", "costS6a:  ${costS6a} ")
+
+                            selectcostList.add("S2a - Binary Search on Unique Select" to costS2a)
+                            selectcostList.add("S3a - PrimaryKey index Select" to cost3a)
+//                    selectcostList.add("cost3b" to cost3b )
+                            selectcostList.add("S6a - Secondary Index on Unique Select" to costS6a)
+
+
+
+                            return selectcostList
+
+
+                        }else{
+                            //handles range primary
+// Range Operator using primary
+                            // and S4
+                            Log.d("queryType", "Range Operator")
+
+                            var targetvalue =
+                                CostEstimatorRepo.writtenQuery[CostEstimatorRepo.writtenQuery.indexOf("SSN") + 2] //value of primary key
+
+
+
+                            var costS4 =
+                                S4IndexForMultipleRecords(indexLevel = x!!, blockCount = blockCount!!)
+
+                            Log.d("PKrange", "costS4:  ${costS4} ")
+
+                            selectcostList.add("CS4 - Ordering-Index for multiple Records" to costS4)
+
+                            return selectcostList
+
+
+                        }
+                    }else { //if non primary
+
+                        if (it.operator.equals("=")){
+                            //handles equality non PK
+
+                            var s = CostEstimatorRepo.empMetadatas.firstOrNull {
+                                it.EmpAttribute.equals(
+                                    selectedAttribute
+
+                                )
+                            }?.selectionCardinality //Selection Cardinality of attribute selected
+                            var bFirst = CostEstimatorRepo.indexMetadatas.firstOrNull {
+                                it.indexName.equals(
+                                    "Employee_managerSSN",
+                                    ignoreCase = true
+                                )
+                            }?.firstLevelBlockCount //first level block count of index
+                            Log.d("NPK", "selectedAttribute:  ${selectedAttribute}")
+                            Log.d("NPK", "s: ${s}")
+
+                            //S2b
+                            var costS2b = S2BinarySearchCost(blockCount!!, s!!, empBfr!!) // [WORKING]
+
+
+                            //S6ab secondary index on a non-key attribute with an equality condition
+                            var costS6ab = S6SecondaryIndexCost(x!!, false, false, s!!, bFirst!!)
+
+                            Log.d("NPKequality", "costS2b:  ${costS2b} ")
+                            Log.d("NPKequality", "costS6a Nonkey:  ${costS6ab} ")
+
+                            selectcostList.add("S2b - Binary Search on non-primary Select" to costS2b)
+                            selectcostList.add("S6ab - Secondary Index on non-primary Select" to costS6ab)
+
+                            return selectcostList
+
+
+                        }else{
+                            //handles range non PK
+                            var costNA = 0
+                            selectcostList.add("Not Applicable" to costNA)
+
+                            return selectcostList
+
+
+
+                        }
+
+                    }
+
+
+
+                }
+
+
+                return selectcostList
+            }else{
+                //brute force S1 used
+//                S1LinearSearch()
+               //check if from employee or project
+                if (listOf("projectno", "projectname", "description", "projectloc", "managedby").indexOf(element = it.attributeName.lowercase()) >= 0) {
+                    //get needed arguments for the cost in project
+                    var blockCount = CostEstimatorRepo.tableMetadatas.firstOrNull {
+                        it.tableName.equals(
+                            "Project",
+                            ignoreCase = true
+                        )
+                    }?.blockCount
+                    var rowCount = CostEstimatorRepo.tableMetadatas.firstOrNull {
+                        it.tableName.equals(
+                            "Project",
+                            ignoreCase = true
+                        )
+                    }?.rowCount
+                    var projBfr = CostEstimatorRepo.tableMetadatas.firstOrNull {
+                        it.tableName.equals(
+                            "PROJECT",
+                            ignoreCase = true
+                        )
+                    }?.bfr
+                    var x = CostEstimatorRepo.indexMetadatas.firstOrNull {
+                        it.indexName.equals(
+                            "Project_ProjectNo",
+                            ignoreCase = true
+                        )
+                    }?.level //returns level of index
+
+                    if (it.attributeName.equals("projectno", ignoreCase = true)) { //if primary
+                        if (it.operator.equals("=")) { //handles equality primary
+                            var primaryKey =
+                                CostEstimatorRepo.writtenQuery[CostEstimatorRepo.writtenQuery.indexOf("ProjectNo")] //position of primary key
+//                    var primaryKeyValue = writtenQuery[writtenQuery.indexOf("=") + 1] //value of primary key
+                            var targetvalue =
+                                CostEstimatorRepo.writtenQuery[CostEstimatorRepo.writtenQuery.indexOf("=") + 1] //value of primary key
+
+                            Log.d("primarykey2", "primaryKey ${primaryKey} ")
+                            Log.d("primarykey2", "blockCount ${blockCount} ")
+
+//                    Log.d("primarykey", "primaryKeyValue ${primaryKeyValue} ")
+//                    S1a-----
+                            var isFound = valueExists(targetvalue, "ProjectNo",
+                                CostEstimatorRepo.projects
+                            )
+                            Log.d("primarykey2", "isFound ${isFound} ")
+
+                            var costS1a = S1LinearSearch(
+                                notFound = !isFound,
+                                unique = true,
+                                equality = true,
+                                blockCount = blockCount!!
+                            )
+                            selectcostList.add("S1a - Linear Search on unique Select" to costS1a)
+                            return selectcostList
+
+                        }else{ //handles range primary
+
+                            var costS1c = S1LinearSearch(
+                                notFound = false,
+                                unique = true,
+                                equality = false,
+                                blockCount = blockCount!!
+                            )
+                            selectcostList.add("CS1c - Linear Search" to costS1c)
+                            return selectcostList
+
+                        }
+
+                    }else{ //if non primary
+
+                        if (it.operator.equals("=")) { //handles equality primary
+                            var costS1b = S1LinearSearch(
+                                notFound = false,
+                                unique = false,
+                                equality = true,
+                                blockCount = blockCount!!
+                            )
+                            selectcostList.add("S1b - Linear Search on non-primary Select" to costS1b)
+                            return selectcostList
+
+                        }else{ //handles range primary
+
+                            var costS1c = S1LinearSearch(
+                                notFound = false,
+                                unique = false,
+                                equality = false,
+                                blockCount = blockCount!!
+                            )
+                            selectcostList.add("CS1c - Linear Search" to costS1c)
+                            return selectcostList
+
+                        }
+
+                    }
+
+
+
+
+
+                } else { //handle employee table
+                    //attribute for employees
+                    var blockCount = CostEstimatorRepo.tableMetadatas.firstOrNull {
+                        it.tableName.equals(
+                            "Employee",
+                            ignoreCase = true
+                        )
+                    }?.blockCount
+                    var rowCount = CostEstimatorRepo.tableMetadatas.firstOrNull {
+                        it.tableName.equals(
+                            "Employee",
+                            ignoreCase = true
+                        )
+                    }?.rowCount
+                    var empBfr = CostEstimatorRepo.tableMetadatas.firstOrNull {
+                        it.tableName.equals(
+                            "Employee",
+                            ignoreCase = true
+                        )
+                    }?.bfr
+                    var x = CostEstimatorRepo.indexMetadatas.firstOrNull {
+                        it.indexName.equals(
+                            "Employee_SSN",
+                            ignoreCase = true
+                        )
+                    }?.level //returns level of index
+
+                    if (it.attributeName.equals("SSN", ignoreCase = true)) { //if primary
+                        if (it.operator.equals("=")) { //handles equality primary
+
+                            var costS1a = S1LinearSearch(
+                                notFound = false,
+                                unique = true,
+                                equality = true,
+                                blockCount = blockCount!!
+                            )
+                            selectcostList.add("S1a - Linear Search on unique Select" to costS1a)
+                            return selectcostList
+
+
+                        }else{ //handles range primary
+
+                            var costS1c = S1LinearSearch(
+                                notFound = false,
+                                unique = true,
+                                equality = false,
+                                blockCount = blockCount!!
+                            )
+                            selectcostList.add("CS1c - Linear Search" to costS1c)
+                            return selectcostList
+
+                        }
+
+                    }else{ //if non primary
+
+                        if (it.operator.equals("=")) { //handles equality primary
+
+                            var costS1b = S1LinearSearch(
+                                notFound = false,
+                                unique = false,
+                                equality = true,
+                                blockCount = blockCount!!
+                            )
+                            selectcostList.add("S1b - Linear Search on non-primary Select" to costS1b)
+                            return selectcostList
+
+
+                        }else{ //handles range primary
+
+                            var costS1c = S1LinearSearch(
+                                notFound = false,
+                                unique = false,
+                                equality = false,
+                                blockCount = blockCount!!
+                            )
+                            selectcostList.add("CS1c - Linear Search" to costS1c)
+                            return selectcostList
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+
+        }
+
+        return selectcostList
+    }
+
 
 }
 
