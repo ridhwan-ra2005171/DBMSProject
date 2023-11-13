@@ -1,0 +1,113 @@
+Employee table:
+#        Primary Key and Equality Operator:
+SELECT * FROM Employee WHERE SSN = '1234';
+SELECT * FROM Employee WHERE SSN = '2345';
+SELECT * FROM Employee WHERE SSN = '5678';
+SELECT * FROM Employee WHERE SSN = '6789';
+SELECT * FROM Employee WHERE SSN = '3456';
+SELECT * FROM Employee WHERE SSN = '4567';
+SELECT * FROM Employee WHERE SSN = '9876';
+SELECT * FROM Employee WHERE SSN = '2348';
+SELECT * FROM Employee WHERE SSN = '9871';
+SELECT * FROM Employee WHERE SSN = '2349';
+SELECT * FROM Employee WHERE SSN = '1235';
+SELECT * FROM Employee WHERE SSN = '6780';
+SELECT * FROM Employee WHERE SSN = '1236';
+SELECT * FROM Employee WHERE SSN = '7891';
+SELECT * FROM Employee WHERE SSN = '1237';
+SELECT * FROM Employee WHERE SSN = '7892';
+SELECT * FROM Employee WHERE SSN = '6781';
+SELECT * FROM Employee WHERE SSN = '1239';
+SELECT * FROM Employee WHERE SSN = '7893';
+SELECT * FROM Employee WHERE SSN = '2341';
+SELECT * FROM Employee WHERE SSN = '7894';
+SELECT * FROM Employee WHERE SSN = '2342';
+SELECT * FROM Employee WHERE SSN = '7895';
+SELECT * FROM Employee WHERE SSN = '2343';
+SELECT * FROM Employee WHERE SSN = '7896';
+SELECT * FROM Employee WHERE SSN = '2344';
+SELECT * FROM Employee WHERE SSN = '7897';
+SELECT * FROM Employee WHERE SSN = '2346';
+SELECT * FROM Employee WHERE SSN = '7898';
+SELECT * FROM Employee WHERE SSN = '2347';
+
+
+
+
+        // Range Operator:
+//        SELECT * FROM Employee WHERE HireDate >= 'start_date' AND HireDate <= 'end_date';
+        //Non-Primary Key using Equality Operator:
+//        SELECT * FROM Employee WHERE Fname = 'Sophia';
+        //Non-Primary Key using Range Operator:
+//        SELECT * FROM Employee WHERE HireDate >= 'start_date' AND HireDate <= 'end_date';
+
+Project Table:
+        //Primary Key and Equality Operator:
+SELECT * FROM PROJECT WHERE ProjectNo = 101;
+
+        //Using primary Range Operator:
+SELECT * FROM PROJECT WHERE ProjectNo BETWEEN 2 AND 4;
+
+        //Non-Primary Key using Equality Operator:
+SELECT * FROM PROJECT WHERE ProjectLoc = Downtown;
+
+        //Non-Primary Key using Range Operator:
+SELECT * FROM PROJECT WHERE ManagedBy BETWEEN 'Manager 1' AND 'Manager 2';
+
+
+
+//------------------------------------------------------------
+
+
+Employee Table:
+•	Primary Key and Equality Operator:
+SELECT * FROM Employee WHERE SSN = '1234';
+SELECT * FROM Employee WHERE SSN = '2345';
+
+•	Non-Primary Key on Equality Operator:
+SELECT * FROM Employee WHERE Fname = 'Mia';
+SELECT * FROM Employee WHERE Minit = 'R';
+SELECT * FROM Employee WHERE Lname = 'Mia';
+SELECT * FROM Employee WHERE DOB = '1988-06-14';
+SELECT * FROM Employee WHERE Address = '456 Oak St';
+SELECT * FROM Employee WHERE Gender = 'Female';
+SELECT * FROM Employee WHERE PhoneNo = '555-123-4567';
+SELECT * FROM Employee WHERE HireDate = '2017-09-05';
+SELECT * FROM Employee WHERE Manager = false;
+SELECT * FROM Employee WHERE ManagerSSN = 1234;
+
+
+•	Primary on Range Operator:
+SELECT * FROM Employee WHERE SSN > 6781;
+SELECT * FROM Employee WHERE SSN < 6781;
+SELECT * FROM Employee WHERE SSN >= 6781;
+SELECT * FROM Employee WHERE SSN <= 6781;
+
+•	Non-Primary Key using Range Operator:
+SELECT * FROM Employee WHERE HireDate >= 'start_date'
+
+
+
+Project Table:
+•	Primary Key and Equality Operator:
+SELECT * FROM PROJECT WHERE ProjectNo = 101;
+SELECT * FROM PROJECT WHERE ProjectNo = 103;
+
+•	Non-Primary Key on Equality Operator:
+SELECT * FROM PROJECT WHERE ManagedBy = 5678
+SELECT * FROM PROJECT WHERE ProjectName = 'Software Development'
+SELECT * FROM PROJECT WHERE ProjectLoc = 'Tech Park'
+SELECT * FROM PROJECT WHERE Description = 'Development of a new software application'
+
+
+•	Primary on Range Operator:
+SELECT * FROM PROJECT WHERE ProjectNo < 103;
+SELECT * FROM PROJECT WHERE ProjectNo > 103;
+SELECT * FROM PROJECT WHERE ProjectNo <= 103;
+SELECT * FROM PROJECT WHERE ProjectNo >= 103;
+
+•	Non-Primary Key using Range Operator:
+SELECT * FROM PROJECT WHERE ManagedBy < 5678
+SELECT * FROM PROJECT WHERE ManagedBy > 5678
+SELECT * FROM PROJECT WHERE ManagedBy <= 5678
+SELECT * FROM PROJECT WHERE ManagedBy >= 5678
