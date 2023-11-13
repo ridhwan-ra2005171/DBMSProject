@@ -58,6 +58,22 @@ fun valueExists(targetValue : String, targetAttribute: String, table: List<Any>)
     return exists
 }
 
+fun indexExists(selectedAttribute: String): Boolean {
+    var exists = false
+    var indexName = CostEstimatorRepo.empMetadatas.firstOrNull { it.EmpAttribute.equals(selectedAttribute, ignoreCase = true) }?.indexName //gets indexName
+
+
+    if (indexName != null) {
+        exists = true
+        return exists
+    }else
+        return exists
+    
+
+
+}
+
+
 // This method searches if the attribute entered exists in the tables columns
 // like if target Attribute is EmpNo from table Employee, it will return FALSE
 fun attributeExists(targetAttribute: String, table: List<Any>) : Boolean {
