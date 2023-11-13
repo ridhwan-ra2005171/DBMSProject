@@ -87,6 +87,13 @@ object searchAlgorithms{
         }).toInt()
     }
 
+
+    //S7 Conjunctive (AND)
+    //S7DisjunctionCost
+//    fun S7DisjunctionCost(): Int {
+//
+//    }
+
 }
 
 // Testing the Search Algorithms
